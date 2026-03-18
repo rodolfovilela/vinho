@@ -51,20 +51,18 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: OVTheme.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: OVTheme.lightBackground,
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
-        title: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                    'assets/images/logo_ov.png',
-                    height: MediaQuery.sizeOf(context).height * 0.1,
-                  ),
-            ],
+        title: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: Image.asset(
+              'assets/images/logo_ov.png',
+              height: kToolbarHeight * 0.8,
+            ),
           ),
         ),
       ),
@@ -76,8 +74,8 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.max,
             children: [
-              QuickSearchView(), 
-              SizedBox(height: 16),
+              /* QuickSearchView(), 
+              SizedBox(height: 16), */
               EventsView(),
             ],
           ),

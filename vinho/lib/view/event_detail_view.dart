@@ -1,8 +1,10 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/model/event_model.dart';
-import 'package:vinho/theme/gradient_border_container.dart';
 import 'package:vinho/theme/ov_theme.dart';
+import 'package:vinho/util/layout.dart';
 
 class EventDetailView extends StatefulWidget {
   final EventModel event;
@@ -32,123 +34,134 @@ class _EventDetailViewState extends State<EventDetailView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight + 30),
+        preferredSize: const Size.fromHeight(kToolbarHeight),
         child: Hero(tag: 'app_bar', child: buildHeader(context)),
       ),
-      backgroundColor: OVTheme.deepPurple,
+      backgroundColor: OVTheme.backgroundColor,
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 4),
-            width: double.infinity,
-            child: GradientBorderContainer(
-              gradientColors: [OVTheme.purpleNeon, OVTheme.magentaNeon],
-              backgroundColor: Colors.transparent,
-              borderWidth: 0.5,
-              child: buildEventCard(widget.event),
-            ),
-          ),
-        ),
+        child: buildEventCard(widget.event),
       ),
     );
   }
 
- Widget buildEventCard(EventModel event) {
+  Widget buildEventCard(EventModel event) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (event.image != null && event.image!.isNotEmpty)
-          ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
+          Container(
+            margin: const EdgeInsets.only(bottom: 8.0),
+            width: double.infinity,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.heightOf(context) * 0.25,
+              minHeight: MediaQuery.heightOf(context) * 0.1,
             ),
-            child: Container(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.heightOf(context) * 0.3,
-                minHeight: MediaQuery.heightOf(context) * 0.1,
-              ),
-              child: Image.asset(
-                "assets/images${event.image!}",
-                fit: BoxFit.fill,
-              ),
+            child: Image.asset(
+              "assets/images${event.image}",
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(),
             ),
           ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
+        Container(
+          padding: EdgeInsets.all(8),
+          margin: EdgeInsets.all(8),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: OVTheme.semiTransparent, width: 0.8),
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                event.title ?? "-",
-                style: OVTheme.bodyBase.copyWith(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              if ((event.desc ?? "").isNotEmpty)
-                Text(
-                  event.desc!,
-                  style: OVTheme.bodyBase.copyWith(
-                    fontSize: 13,
-                    color: OVTheme.lightGray,
+              if ((event.date ?? "").isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.calendar_month_outlined,
+                          color: OVTheme.primaryRed,
+                          size: 18,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          event.date!,
+                          style: OVTheme.bodyBase /* .copyWith(fontSize: 18) */,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              if ((event.date ?? "").isNotEmpty ||
-                  (event.time ?? "").isNotEmpty ||
-                  (event.location ?? "").isNotEmpty)
+              if ((event.time ?? "").isNotEmpty)
                 Container(
                   padding: const EdgeInsets.only(top: 16.0),
-                  child: Wrap(
-                    spacing: 8.0,
-                    runSpacing: 8.0,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.access_time,
+                          color: OVTheme.primaryRed,
+                          size: 18,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          event.time!,
+                          style: OVTheme.bodyBase /* .copyWith(fontSize: 18) */,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              if ((event.location ?? "").isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if ((event.date ?? "").isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 2),
-                          child: Text(
-                            event.date!,
-                            style: OVTheme.bodyBase.copyWith(
-                              fontSize: 11,
-                              color: OVTheme.lightGray,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.pin_drop_outlined,
+                            color: OVTheme.primaryRed,
+                            size: 18,
+                          ),
+                          SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              event.location!,
+                              style: OVTheme
+                                  .bodyBase /* .copyWith(fontSize: 18) */,
+                              /*   overflow: TextOverflow.ellipsis,
+                              maxLines: , */
                             ),
                           ),
-                        ),
-                      if ((event.time ?? "").isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: Text(
-                            event.time!,
-                            style: OVTheme.bodyBase.copyWith(
-                              fontSize: 11,
-                              color: OVTheme.lightGray,
-                            ),
-                          ),
-                        ),
-
-
-                      if ((event.location ?? "").isNotEmpty)
+                        ],
+                      ),
+                      if (event.address != null && event.address!.isNotEmpty)
+                        SizedBox(height: 4),
+                      if (event.address != null && event.address!.isNotEmpty)
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              Icons.pin_drop,
-                              color: OVTheme.lightGray,
-                              size: 14,
-                            ),
-                            SizedBox(width: 2),
+                            SizedBox(width: 22),
                             Flexible(
                               child: Text(
-                                event.location!,
+                                event.address ?? "",
                                 style: OVTheme.bodyBase.copyWith(
-                                  fontSize: 11,
-                                  color: OVTheme.lightGray,
+                                  color: OVTheme.muted,
+                                  fontSize: 13,
                                 ),
-                                overflow: TextOverflow.ellipsis,
+                                /*   overflow: TextOverflow.ellipsis,
+                                maxLines: 2, */
                               ),
                             ),
                           ],
@@ -156,52 +169,294 @@ class _EventDetailViewState extends State<EventDetailView> {
                     ],
                   ),
                 ),
+              if (event.availableSeats != null || event.totalSeats != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: /* (event.totalSeats == null)
+                            ?  */
+                            MainAxisAlignment
+                                .start /* : MainAxisAlignment.spaceBetween */,
+                        children: [
+                          if (event.totalSeats == null)
+                            Icon(
+                              Icons.people_outline,
+                              color: OVTheme.primaryRed,
+                              size: 18,
+                            ),
+                          if (event.totalSeats == null) SizedBox(width: 4),
+                          if (event.totalSeats == null)
+                            Text(
+                              AppLocalizations.of(context)!
+                                  .seatsLeft(event.availableSeats.toString()),
+                              style: OVTheme.bodyBase.copyWith(
+                                fontSize: 13,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          if (event.availableSeats != null &&
+                              event.totalSeats != null)
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.people_outline,
+                                    color: OVTheme.primaryRed,
+                                    size: 18,
+                                  ),
+                                  SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .seatsRemaining(
+                                              event.availableSeats.toString(),
+                                              event.totalSeats ?? 0),
+                                      style: OVTheme.bodyBase.copyWith(
+                                        fontSize: 13,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  /*  Flexible(
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .availability,
+                                      style: OVTheme.bodyBase.copyWith(
+                                        color: OVTheme.muted,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ), */
+                                ],
+                              ),
+                            ),
+                          /* if (event.availableSeats != null &&
+                              event.totalSeats != null)
+                            Flexible(
+                              child: Text(
+                                AppLocalizations.of(context)!.seatsRemaining(
+                                    event.availableSeats.toString(),
+                                    event.totalSeats ?? 0),
+                                style: OVTheme.bodyBase.copyWith(
+                                  fontSize: 13,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ), */
+                        ],
+                      ),
+                      if (event.availableSeats != null &&
+                          event.totalSeats != null)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.only(top: 6, left: 13),
+                          child: LinearPercentIndicator(
+                            percent: (((event.availableSeats ?? 0) /
+                                        (event.totalSeats ?? 1)) -
+                                    1) *
+                                -1,
+                            lineHeight: 6.0,
+                            linearStrokeCap: LinearStrokeCap.roundAll,
+                            animation: true,
+                            animationDuration: 1000,
+                            curve: Curves.easeInOut,
+                            animateFromLastPercent: true,
+                            progressColor: OVTheme.primaryRed,
+                            backgroundColor: OVTheme.semiTransparent,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              if (event.paxPrice != null && event.paxPrice! >= 0)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.money_outlined,
+                          color: OVTheme.primaryRed,
+                          size: 18,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          (event.paxPrice != null && event.paxPrice! > 0)
+                              ? AppLocalizations.of(context)!.paxPrice(
+                                  formatCurrency.format(event.paxPrice))
+                              : AppLocalizations.of(context)!.freeEntrance,
+                          style: OVTheme.bodyBase.copyWith(
+                              color: OVTheme.primaryColor,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
             ],
           ),
         ),
+
+        /*  if ((event.paxPrice ?? 0) > 0 || (event.availableSeats ?? 0) > 0)
+          Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border(
+                    top:
+                        BorderSide(color: OVTheme.semiTransparent, width: 0.8)),
+              ),
+              margin: const EdgeInsets.only(top: 16.0),
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      formatCurrency.format(event.paxPrice),
+                      style: OVTheme.bodyBase.copyWith(
+                          color: OVTheme.primaryColor,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                          Icon(
+                            Icons.people_outline,
+                            color: OVTheme.primaryRed,
+                            size: 16,
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            "${event.availableSeats.toString()} ${AppLocalizations.of(context)!.seatsLeft}",
+                            style:
+                                OVTheme.bodyBase.copyWith(color: OVTheme.muted),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ])),
+                  ])), */
+        if ((event.detailedDesc ?? "").isNotEmpty)
+          Container(
+            padding: EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    AppLocalizations.of(context)!.aboutThisEvent,
+                    style: OVTheme.titlesBase.copyWith(
+                      //fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: OVTheme.primaryColor,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+                HtmlWidget(event.detailedDesc!,
+                    textStyle: OVTheme.bodyBase.copyWith(
+                      fontSize: 16,
+                      color: OVTheme.primaryColor,
+                    ))
+                /*  Text(
+                  event.detailedDesc!,
+                  style: OVTheme.bodyBase.copyWith(
+                    fontSize: 16,
+                    color: OVTheme.primaryColor,
+                  ),
+                ), */
+              ],
+            ),
+          ),
+        if (event.hostName != null && event.hostName!.isNotEmpty)
+          Container(
+            padding: EdgeInsets.all(8),
+            margin: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: OVTheme.lightBackground,
+              border: Border.all(color: OVTheme.semiTransparent, width: 0.8),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    AppLocalizations.of(context)!.hostedBy,
+                    style: OVTheme.titlesBase.copyWith(
+                      //  fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: OVTheme.primaryColor,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+                Text(
+                  event.hostName!,
+                  style: OVTheme.bodyBase.copyWith(
+                    fontSize: 16,
+                    color: OVTheme.muted,
+                  ),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
 
   Widget buildHeader(BuildContext context) {
     return AppBar(
-      backgroundColor: OVTheme.deepPurple,
+      elevation: 0,
+      shadowColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+      surfaceTintColor: Colors.transparent,
+      backgroundColor: OVTheme.lightBackground,
       leading: ModalRoute.of(context)!.canPop
           ? IconButton(
               onPressed: () => Navigator.pop(context),
               icon: const Icon(
-                Icons.close_sharp,
-                color: OVTheme.lightGray,
+                Icons.arrow_back,
+                color: OVTheme.primaryColor,
                 size: 16,
               ),
             )
           : null,
-      iconTheme: IconThemeData(color: OVTheme.lightGray),
+      iconTheme: IconThemeData(color: OVTheme.primaryColor),
       titleSpacing: 0.0,
-      /*  bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(30),
-        child: Container(
-          padding: const EdgeInsets.only(left: 12.0),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            border: Border(bottom: BorderSide(color: Colors.grey, width: .4)),
+      title: Flexible(
+        child: Text(
+          widget.event.title ?? "",
+          style: OVTheme.titlesBase.copyWith(
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+            fontSize: 21,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [],
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          softWrap: true,
+        ),
+      ), /* FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: Text(
+            widget.event.title ?? "",
+            style: OVTheme.titlesBase.copyWith(
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+              fontSize: 21,
+            ),
           ),
         ),
       ), */
-      title: Wrap(
-        children: [
-          Text(
-            widget.event.title ?? "",
-            style: OVTheme.bodyBase.copyWith(fontWeight: FontWeight.w500),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
     );
   }
 }
-

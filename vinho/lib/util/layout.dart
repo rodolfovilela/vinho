@@ -28,3 +28,7 @@ ScreenSize getScreenSize(BuildContext context) {
   return ScreenSize.small;
 }
  */
+
+import 'package:intl/intl.dart';
+
+final formatCurrency = NumberFormat.simpleCurrency(locale: 'pt_PT');

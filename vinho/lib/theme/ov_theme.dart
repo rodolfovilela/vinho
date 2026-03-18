@@ -135,15 +135,18 @@ class OVTheme {
   static const Color backgroundColor = Color.fromRGBO(250, 248, 245, 1);
   static const Color primaryColor = Color.fromRGBO(45, 24, 16, 1);
   static const Color muted = Color.fromRGBO(112, 93, 82, 1);
+  static const Color mutedBackground = Color.fromRGBO(232, 223, 214, 1);
+  static const Color lightBackground = Color.fromRGBO(248, 245, 240, 1);
   static const Color semiTransparent = Color.fromRGBO(109, 77, 58, 0.15);
   static const Color primaryBlack = Color.fromRGBO(45, 24, 16, 1);
   static const Color primaryRed = Color.fromRGBO(107, 40, 52, 1);
   
 
   static TextStyle bodyBase = GoogleFonts.lato(
-    color: OVTheme.vaporwaveGray
+    color: OVTheme.vaporwaveGray, 
+    letterSpacing: 0.25
   );
-  static TextStyle titlesBase = GoogleFonts.playfair(
+  static TextStyle titlesBase = GoogleFonts.playfairDisplaySc(
     color: OVTheme.vaporwaveGray
   );
 }

@@ -3,6 +3,12 @@
   "upcomingEvents": "Upcoming events",
   "searchButton": "Search",
   "searchHint": "Location...",
-  "seatsLeft": "seats left",
-  "pperson": "p/ person"
+  "seatsLeft": "{seatsLeft} seats left",
+  "paxPrice": "{paxPrice} per person",
+  "freeEntrance":"Free entrance",
+  "aboutThisEvent": "About this event",
+  "availability":"Availability",
+  "seatsRemaining": "{seatsLeft} of {totalSeats} seats remaining",
+  "hostedBy": "Hosted by"
 }
+
