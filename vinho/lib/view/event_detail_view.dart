@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -38,8 +40,10 @@ class _EventDetailViewState extends State<EventDetailView> {
         child: Hero(tag: 'app_bar', child: buildHeader(context)),
       ),
       backgroundColor: OVTheme.backgroundColor,
-      body: SingleChildScrollView(
-        child: buildEventCard(widget.event),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: buildEventCard(widget.event),
+        ),
       ),
     );
   }
@@ -346,8 +350,72 @@ class _EventDetailViewState extends State<EventDetailView> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (event.sommelierName != null &&
+                    event.sommelierName!.isNotEmpty)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      /* Text(
+                        AppLocalizations.of(context)!
+                            .withVar(event.sommelierName!),
+                        style: OVTheme.bodyBase.copyWith(
+                          color: OVTheme.muted,
+                          fontSize: 13,
+                        ),
+                      ), */
+
+                      HtmlWidget(
+                        '<p style="text-align: right; display: block;">${AppLocalizations.of(context)!
+                            .withVar(event.sommelierName!)}</p>',
+                        textStyle: OVTheme.bodyBase.copyWith(
+                        
+                          color: OVTheme.muted,
+                          fontSize: 13,
+                        ),
+                      ),
+                      Container(
+                        width: 45,
+                        height: 45,
+                        margin: EdgeInsets.only(left: 10),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                              color: (event.sommelierImgUrl == null ||
+                                      event.sommelierImgUrl!.isEmpty)
+                                  ? OVTheme.primaryRed
+                                  : OVTheme.lightBackground,
+                              width: 2),
+                          /* boxShadow: [
+                          BoxShadow(
+                            color: OVTheme.primaryRed.withOpacity(0.4),
+                            blurRadius: 5,
+                            offset: Offset(2, 2),
+                          ),
+                        ], */
+                        ),
+                        child: CircleAvatar(
+                          radius: 10,
+                          backgroundImage: (event.sommelierImgUrl != null &&
+                                  event.sommelierImgUrl!.isNotEmpty)
+                              ? NetworkImage(
+                                  event.sommelierImgUrl!,
+                                )
+                              : null,
+                          backgroundColor: Colors.transparent,
+                          child: (event.sommelierImgUrl == null ||
+                                  event.sommelierImgUrl!.isEmpty)
+                              ? Icon(
+                                  Icons.person,
+                                  color: OVTheme.primaryRed,
+                                  size: 30,
+                                )
+                              : null,
+                        ),
+                      ),
+                    ],
+                  ),
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Text(
                     AppLocalizations.of(context)!.aboutThisEvent,
                     style: OVTheme.titlesBase.copyWith(
@@ -431,18 +499,15 @@ class _EventDetailViewState extends State<EventDetailView> {
           : null,
       iconTheme: IconThemeData(color: OVTheme.primaryColor),
       titleSpacing: 0.0,
-      title: Flexible(
-        child: Text(
-          widget.event.title ?? "",
-          style: OVTheme.titlesBase.copyWith(
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
-            fontSize: 21,
-          ),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          softWrap: true,
+      title: Text(
+        widget.event.title ?? "",
+        style: OVTheme.titlesBase.copyWith(
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.5,
+          fontSize: 21,
         ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ), /* FittedBox(
         fit: BoxFit.scaleDown,
         child: Padding(

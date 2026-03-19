@@ -10,6 +10,8 @@ class EventModel {
   String? address;
   String? region;
   String? hostName;
+  String? sommelierName;
+  String? sommelierImgUrl;
   int? order;
   double? paxPrice;
   int? availableSeats;
@@ -27,6 +29,8 @@ class EventModel {
     this.address,
     this.region,
     this.hostName,
+    this.sommelierName,
+    this.sommelierImgUrl,
     this.time,
     this.paxPrice,
     this.availableSeats,

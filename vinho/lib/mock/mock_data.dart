@@ -12,6 +12,8 @@ List<EventModel> get mockedEvents => List.from(<EventModel>[
         location: "Restaurante Descobre (Belém)",
         address: "Rua Bartolomeu Dias 117, Lisboa",
         hostName: "Restaurante Descobre",
+        sommelierName: "<b>João Silva</b> (sommelier) e<br/><b>Maria Fernandes</b> (hostess)",  
+        sommelierImgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Sommelier_F.I.S.A.R..jpg/330px-Sommelier_F.I.S.A.R..jpg',
         paxPrice: 25,
         availableSeats: 10,
         totalSeats: 20,
@@ -27,6 +29,7 @@ List<EventModel> get mockedEvents => List.from(<EventModel>[
         location: "Pizzaria Chica Pimenta (Charneca de Caparica)",
         address: "Rua da Liberdade 45, Charneca de Caparica",
         hostName: "Pizzaria Chica Pimenta",
+        sommelierName: "Maria Fernandes",
         paxPrice: 25,
         availableSeats: 2,
         totalSeats: 10
@@ -44,6 +47,7 @@ List<EventModel> get mockedEvents => List.from(<EventModel>[
         location: "Restaurante A Caldeira (Charneca de Caparica)",
         address: "Rua da Liberdade 45, Charneca de Caparica",
         hostName: "Restaurante A Caldeira",
+        sommelierName: "<b>João Silva</b> e <b>Maria Fernandes</b>" ,
         paxPrice: 25,
         availableSeats: 3,
         totalSeats: 15
@@ -58,6 +62,7 @@ List<EventModel> get mockedEvents => List.from(<EventModel>[
           location: "Fábrica do Pão, Beato Innovation District, Lisboa",
           address: "Rua do Açúcar 86, Lisboa",
           hostName: "Fábrica do Pão",
+          sommelierName: "<b>Maria Fernandes</b>",
           region: "Lisboa",
           paxPrice: 25,
           totalSeats: 50,

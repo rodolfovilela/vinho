@@ -36,7 +36,6 @@ class _EventsViewState extends State<EventsView> {
 
   @override
   Widget build(BuildContext context) {
-    
     return RawScrollbar(
       controller: _scrollController,
       thumbVisibility: true,
@@ -44,7 +43,7 @@ class _EventsViewState extends State<EventsView> {
       /*   thumbColor: OVTheme.magentaNeon,
       trackColor: Colors.transparent, */
       thickness: 8,
-    //  radius: const Radius.circular(12),
+      //  radius: const Radius.circular(12),
       minThumbLength: 50,
       child: SingleChildScrollView(
         controller: _scrollController,
@@ -81,7 +80,7 @@ class _EventsViewState extends State<EventsView> {
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-               // borderRadius: BorderRadius.circular(12),
+                // borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: OVTheme.semiTransparent, width: 0.8),
                 /*  boxShadow: [
                   BoxShadow(
@@ -107,24 +106,25 @@ class _EventsViewState extends State<EventsView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (event.image != null && event.image!.isNotEmpty)
-         /*  ClipRRect(
+          /*  ClipRRect(
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(12),
               topRight: Radius.circular(12),
             ),
-            child: */ Container(
-              width: double.infinity,
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.3,
-                minHeight: MediaQuery.of(context).size.height * 0.1,
-              ),
-              child: Image.asset(
-                "assets/images${event.image!}",
-                fit: BoxFit.cover,
-                width: double.infinity,
-              ),
+            child: */
+          Container(
+            width: double.infinity,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.3,
+              minHeight: MediaQuery.of(context).size.height * 0.1,
             ),
-         /*  ), */
+            child: Image.asset(
+              "assets/images${event.image!}",
+              fit: BoxFit.cover,
+              width: double.infinity,
+            ),
+          ),
+        /*  ), */
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -141,15 +141,16 @@ class _EventsViewState extends State<EventsView> {
               ),
               if ((event.desc ?? "").isNotEmpty)
                 Padding(
-                  padding: const EdgeInsets.only(top:8.0),
-                  child: Text(event.desc!,
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    event.desc!,
                     //event.desc!.substring(0, event.desc!.length > 100 ? 100 : event.desc!.length) + (event.desc!.length > 100 ? "..." : ""),
                     style: OVTheme.bodyBase.copyWith(
                       fontSize: 13,
                       color: OVTheme.muted,
                     ),
                     overflow: TextOverflow.fade,
-                    maxLines: 2,
+                    maxLines: 5,
                   ),
                 ),
               if ((event.date ?? "").isNotEmpty ||
@@ -247,11 +248,19 @@ class _EventsViewState extends State<EventsView> {
                     alignment: WrapAlignment.spaceBetween,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Text(
-                        formatCurrency.format(event.paxPrice),
-                        style: OVTheme.bodyBase.copyWith(
-                            color: OVTheme.primaryColor,
-                            fontWeight: FontWeight.w500),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: OVTheme.backgroundColor,
+                          //border: Border.all(color: OVTheme.semiTransparent, width: 0.8),
+                        ),
+                        padding: const EdgeInsets.all(4.0),
+                        child: Text(
+                          formatCurrency.format(event.paxPrice),
+                          style: OVTheme.bodyBase.copyWith(
+                              color: OVTheme.primaryColor,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 0.2),
+                        ),
                       ),
                       FittedBox(
                         fit: BoxFit.scaleDown,
@@ -266,7 +275,8 @@ class _EventsViewState extends State<EventsView> {
                             SizedBox(width: 4),
                             Flexible(
                               child: Text(
-                                AppLocalizations.of(context)!.seatsLeft(event.availableSeats.toString()),
+                                AppLocalizations.of(context)!
+                                    .seatsLeft(event.availableSeats.toString()),
                                 style: OVTheme.bodyBase
                                     .copyWith(color: OVTheme.muted),
                                 overflow: TextOverflow.ellipsis,
@@ -278,7 +288,6 @@ class _EventsViewState extends State<EventsView> {
                     ],
                   ),
                 ),
-            
             ],
           ),
         ),

@@ -9,6 +9,7 @@
   "aboutThisEvent": "About this event",
   "availability":"Availability",
   "seatsRemaining": "{seatsLeft} of {totalSeats} seats remaining",
-  "hostedBy": "Hosted by"
+  "hostedBy": "Hosted by",
+  "withVar": "With: {variable}"
 }
 

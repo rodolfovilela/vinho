@@ -9,5 +9,6 @@
   "aboutThisEvent": "Sobre o evento",
   "availability":"Disponibilidade",
   "seatsRemaining": "Restam {seatsLeft} de {totalSeats} lugares",
-  "hostedBy": "Organizado por"
+  "hostedBy": "Organizado por",
+  "withVar": "Com: {variable}"
 }

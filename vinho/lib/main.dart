@@ -7,7 +7,8 @@ import 'package:vinho/theme/ov_theme.dart';
 import 'package:vinho/view/event_detail_view.dart';
 import 'package:vinho/view/events_view.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-import 'package:vinho/view/quick_search_view.dart';
+import 'package:vinho/view/leads_view.dart';
+import 'package:vinho/view/login_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,6 +22,18 @@ final GoRouter _router = GoRouter(
         return const HomeScreen();
       },
       routes: <RouteBase>[
+        GoRoute(
+          path: 'login',
+          builder: (BuildContext context, GoRouterState state) {
+            return const LoginView();
+          },
+        ),
+        GoRoute(
+          path: 'leads',
+          builder: (BuildContext context, GoRouterState state) {
+            return const LeadsView();
+          },
+        ),
         GoRoute(
           path: 'event_detail',
           builder: (BuildContext context, GoRouterState state) {
@@ -48,36 +61,49 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+  return Scaffold(
       backgroundColor: OVTheme.backgroundColor,
+     
       appBar: AppBar(
         backgroundColor: OVTheme.lightBackground,
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
-        title: Padding(
+        title: Container(
+          alignment: Alignment.centerLeft,
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: FittedBox(
             fit: BoxFit.contain,
             child: Image.asset(
-              'assets/images/logo_ov.png',
+              'assets/images/glass.png',
               height: kToolbarHeight * 0.8,
             ),
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () {
+              context.push('/leads');
+            },
+          ),
+        ],
       ),
 
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              /* QuickSearchView(), 
-              SizedBox(height: 16), */
-              EventsView(),
-            ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                
+                /* QuickSearchView(), 
+                SizedBox(height: 16), */
+                EventsView(),
+              ],
+            ),
           ),
         ),
       ),
