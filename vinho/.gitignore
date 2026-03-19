@@ -34,6 +34,7 @@ migrate_working_dir/
 .pubspec.lock
 pubspec.lock
 /lib/generated
+/lib/firebase_options.dart
 .firebaserc
 .firebase/
 
