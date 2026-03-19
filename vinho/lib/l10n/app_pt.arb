@@ -10,5 +10,12 @@
   "availability":"Disponibilidade",
   "seatsRemaining": "Restam {seatsLeft} de {totalSeats} lugares",
   "hostedBy": "Organizado por",
-  "withVar": "Com: {variable}"
+  "withVar": "Com: {variable}",
+  "slogan1": "O vinho é mais do que uma bebida: é partilha.",
+  "ourMissionTitle": "Nossa missão",
+  "ourMissionDesc": "Conectar pessoas, espaços e talentos e criar uma comunidade <b>onde o vinho</b> acontece.",
+  "hostsTitle": "Seja o local do próximo evento",
+  "hostsDesc": "Tens um restaurante, bar ou espaço comercial e queres receber um dos nossos eventos?<br/><br/>Escreve-nos para hosts@ondeovinho.com e vamos falar sobre o teu espaço.",
+  "sommeliersTitle": "Para profissionais",
+  "sommeliersDesc": "Se és um escanção e queres partilhar seus conhecimentos e paixão pelo vinho, ofereça seu evento para a nossa comunidade.<br/><br/>Mostra-nos a tua paixão pelo vinho: partilha o teu conhecimento e propõe o teu evento por email.<br/>Escreve-nos para sommelier@ondeovinho.com"
 }

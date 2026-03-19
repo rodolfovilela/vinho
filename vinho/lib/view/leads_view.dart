@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:vinho/generated/l10n/app_localizations.dart';
+import 'package:vinho/main.dart';
 import 'package:vinho/model/lead_model.dart';
 import 'package:vinho/theme/ov_theme.dart';
 
@@ -34,7 +36,7 @@ class LeadsView extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom:16.0),
                 child: Text(
-                  "O vinho é mais do que uma bebida: é para partilhar.",
+                  AppLocalizations.of(context)!.slogan1,
                   style: OVTheme.titlesBase
                       .copyWith(fontSize: 24, fontWeight: FontWeight.w600, color: OVTheme.primaryRed  ),
                   textAlign: TextAlign.center,

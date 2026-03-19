@@ -5,6 +5,7 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/l10n_helper/l10n_helper.dart';
 import 'package:vinho/model/event_model.dart';
+import 'package:vinho/model/lead_model.dart';
 import 'package:vinho/theme/ov_theme.dart';
 import 'package:vinho/view/event_detail_view.dart';
 import 'package:vinho/view/events_view.dart';
@@ -12,6 +13,8 @@ import 'package:vinho/view/leads_view.dart';
 import 'package:vinho/view/login_view.dart';
 
 import 'firebase_options.dart';
+
+List<LeadModel> leads = [];
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +45,32 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: 'leads',
           builder: (BuildContext context, GoRouterState state) {
+            if (leads.isEmpty) {
+              leads = leads = [
+                LeadModel(
+                  title: AppLocalizations.of(context)!.ourMissionTitle,
+                  description:
+                      AppLocalizations.of(context)!.ourMissionDesc,
+                  icon: Icons.adjust_outlined,
+                  //  route: '/leads',
+                ),
+                LeadModel(
+                  title: AppLocalizations.of(context)!.hostsTitle,
+                  description:
+                      AppLocalizations.of(context)!.hostsDesc,
+                  icon: Icons.storefront_outlined,
+                  //route: '/leads',
+                ),
+                LeadModel(
+                  title: AppLocalizations.of(context)!.sommeliersTitle,
+                  description:
+                      AppLocalizations.of(context)!.sommeliersDesc,
+                  icon: Icons.work_outline,
+                  // route: '/reports',
+                ),
+              ];
+            }
+
             return const LeadsView();
           },
         ),
@@ -58,14 +87,6 @@ final GoRouter _router = GoRouter(
   ],
 );
 
-class DetailsScreen extends StatelessWidget {
-  const DetailsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold();
-  }
-}
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -130,33 +151,40 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Locale locale = const Locale("pt");
+  Locale? locale;
 
   @override
   Widget build(BuildContext context) {
-    return L10nHelper(
-      currentLocaleCallback: () {
-        return locale;
+    return FutureBuilder<Locale>(
+      future: _getDeviceLocale(),
+      builder: (context, snapshot) {
+        final deviceLocale = snapshot.data ?? const Locale('pt');
+        return L10nHelper(
+          currentLocaleCallback: () => locale ?? deviceLocale,
+          localChangeCallback: (l) => setState(() => locale = l),
+          child: MaterialApp.router(
+            locale: locale ?? deviceLocale,
+            routerConfig: _router,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            builder: (context, child) => ResponsiveBreakpoints.builder(
+              child: child!,
+              breakpoints: [
+                const Breakpoint(start: 0, end: 450, name: MOBILE),
+                const Breakpoint(start: 451, end: 800, name: TABLET),
+                const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+                const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+              ],
+            ),
+          ),
+        );
       },
-      localChangeCallback: (l) {
-        setState(() {
-          locale = l;
-        });
-      },
-      child: MaterialApp.router(
-        routerConfig: _router,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        builder: (context, child) => ResponsiveBreakpoints.builder(
-          child: child!,
-          breakpoints: [
-            const Breakpoint(start: 0, end: 450, name: MOBILE),
-            const Breakpoint(start: 451, end: 800, name: TABLET),
-            const Breakpoint(start: 801, end: 1920, name: DESKTOP),
-            const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
-          ],
-        ),
-      ),
     );
   }
+
+  Future<Locale> _getDeviceLocale() async {
+    final lang = WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+    return lang.startsWith('pt') ? const Locale('pt') : const Locale('en');
+  }
 }
+

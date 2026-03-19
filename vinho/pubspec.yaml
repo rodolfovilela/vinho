@@ -23,6 +23,7 @@ dependencies:
   flutter_form_builder: ^10.3.0+2
   percent_indicator: ^4.2.5
   flutter_widget_from_html: ^0.17.1
+  device_info_plus: ^12.3.0
 
   flutter_localizations:
     sdk: flutter
