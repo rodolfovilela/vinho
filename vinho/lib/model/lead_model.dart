@@ -15,19 +15,8 @@ class LeadModel {
     this.route,
   });
 }
-
+/* 
 List<LeadModel> leads = [
- /*  LeadModel(
-    title: 'Nossa comunidade',
-    description: 'O vinho é mais do que uma bebida: é para partilhar.',
-    image: Image.asset(
-      "assets/images/glass.png",
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) => Container(),
-    ),
-    // icon: Icons.wine_bar,
-    //route: '/leads',
-  ), */
   LeadModel(
     title: 'Nossa missão',
     description:
@@ -49,4 +38,4 @@ List<LeadModel> leads = [
     icon: Icons.work_outline,
     // route: '/reports',
   ),
-];
+]; */
