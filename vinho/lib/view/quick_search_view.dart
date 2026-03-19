@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
-import 'package:vinho/mock/mock_data.dart';
-import 'package:vinho/model/event_model.dart';
 import 'package:vinho/theme/gradient_border_container.dart';
 import 'package:vinho/theme/ov_theme.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class QuickSearchView extends StatefulWidget {
   const QuickSearchView();

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
-import 'package:vinho/l10n_helper/l10n_helper.dart';
-import 'package:vinho/mock/mock_data.dart';
 import 'package:vinho/model/event_model.dart';
+import 'package:vinho/services/firestore_service.dart';
 import 'package:vinho/theme/ov_theme.dart';
 import 'package:vinho/util/layout.dart';
 
@@ -17,15 +15,23 @@ class EventsView extends StatefulWidget {
 
 class _EventsViewState extends State<EventsView> {
   final ScrollController _scrollController = ScrollController();
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
+  List<EventModel> _events = [];
+  late final FirestoreService _firestoreService;
 
   @override
   void initState() {
     super.initState();
+    _firestoreService = FirestoreService();
+    _firestoreService.getEventsStream().listen((snapshot) {
+      setState(() {
+        _events = snapshot.docs.map((doc) => EventModel.fromFirestore(doc)).toList();
+      });
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override
@@ -40,10 +46,7 @@ class _EventsViewState extends State<EventsView> {
       controller: _scrollController,
       thumbVisibility: true,
       trackVisibility: true,
-      /*   thumbColor: OVTheme.magentaNeon,
-      trackColor: Colors.transparent, */
       thickness: 8,
-      //  radius: const Radius.circular(12),
       minThumbLength: 50,
       child: SingleChildScrollView(
         controller: _scrollController,
@@ -54,50 +57,58 @@ class _EventsViewState extends State<EventsView> {
               AppLocalizations.of(context)!.upcomingEvents,
               style: OVTheme.bodyBase.copyWith(
                 fontWeight: FontWeight.w500,
-                //fontSize: 18,
                 letterSpacing: 1.1,
                 wordSpacing: 2,
               ),
             ),
-            ...buildEventsCards(),
+            if (_events.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(64.0),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.event_busy,
+                      size: 64,
+                      color: OVTheme.muted,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Nenhum evento encontrado',
+                      style: OVTheme.titlesBase.copyWith(
+                        fontSize: 20,
+                        color: OVTheme.muted,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Verifique mais tarde ou entre em contato conosco',
+                      style: OVTheme.bodyBase.copyWith(
+                        color: OVTheme.muted,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              )
+            else
+              ..._events.map((event) => GestureDetector(
+                onTap: () => context.go('/event_detail', extra: event),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: OVTheme.semiTransparent, width: 0.8),
+                    ),
+                    child: buildEventCard(event),
+                  ),
+                ),
+              )).toList(),
           ],
         ),
       ),
     );
-  }
-
-  List<Widget> buildEventsCards() {
-    List<Widget> cards = [];
-    for (var c in mockedEvents) {
-      cards.add(
-        GestureDetector(
-          onTap: () {
-            context.go('/event_detail', extra: c);
-          },
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 6),
-            width: double.infinity,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                // borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: OVTheme.semiTransparent, width: 0.8),
-                /*  boxShadow: [
-                  BoxShadow(
-                    color: OVTheme.primaryColor.withOpacity(0.1),
-                    blurRadius:2,
-                    offset: Offset(0, 4),
-                  ),
-                ], */
-              ),
-              child: buildEventCard(c),
-            ),
-          ),
-        ),
-      );
-    }
-
-    return cards;
   }
 
   Widget buildEventCard(EventModel event) {
@@ -106,12 +117,6 @@ class _EventsViewState extends State<EventsView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (event.image != null && event.image!.isNotEmpty)
-          /*  ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-            ),
-            child: */
           Container(
             width: double.infinity,
             constraints: BoxConstraints(
@@ -124,7 +129,6 @@ class _EventsViewState extends State<EventsView> {
               width: double.infinity,
             ),
           ),
-        /*  ), */
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -144,7 +148,6 @@ class _EventsViewState extends State<EventsView> {
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Text(
                     event.desc!,
-                    //event.desc!.substring(0, event.desc!.length > 100 ? 100 : event.desc!.length) + (event.desc!.length > 100 ? "..." : ""),
                     style: OVTheme.bodyBase.copyWith(
                       fontSize: 13,
                       color: OVTheme.muted,
@@ -154,10 +157,7 @@ class _EventsViewState extends State<EventsView> {
                   ),
                 ),
               if ((event.date ?? "").isNotEmpty ||
-                      (event.time ?? "")
-                          .isNotEmpty /* ||
-                  (event.location ?? "").isNotEmpty */
-                  )
+                  (event.time ?? "").isNotEmpty)
                 Container(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: Wrap(
@@ -225,7 +225,6 @@ class _EventsViewState extends State<EventsView> {
                         child: Text(
                           event.location!,
                           style: OVTheme.bodyBase.copyWith(
-                            //   fontsize: 14,
                             color: OVTheme.muted,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -251,7 +250,6 @@ class _EventsViewState extends State<EventsView> {
                       Container(
                         decoration: BoxDecoration(
                           color: OVTheme.backgroundColor,
-                          //border: Border.all(color: OVTheme.semiTransparent, width: 0.8),
                         ),
                         padding: const EdgeInsets.all(4.0),
                         child: Text(
@@ -295,3 +293,4 @@ class _EventsViewState extends State<EventsView> {
     );
   }
 }
+

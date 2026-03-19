@@ -2,7 +2,7 @@ import 'package:vinho/model/event_model.dart';
 
 List<EventModel> get mockedEvents => List.from(<EventModel>[
       EventModel(
-        id: 1,
+        id: "1",
         title: "Degustação Descobre",
         desc: "Degustação de 5 vinhos no Restaurante Descobre",
         detailedDesc: "Junte-se a nós para uma experiência de degustação única no Restaurante Descobre, onde exploraremos uma seleção de 5 vinhos cuidadosamente escolhidos para encantar o seu paladar. Durante esta sessão, você terá a oportunidade de provar uma variedade de vinhos, cada um com suas características distintas, acompanhados por explicações detalhadas sobre suas origens, notas de sabor e harmonizações recomendadas. Seja você um entusiasta do vinho ou um iniciante curioso, esta degustação promete ser uma jornada sensorial que irá enriquecer seu conhecimento e apreciação pelo mundo dos vinhos. Venha descobrir os segredos por trás de cada garrafa e desfrutar de uma noite repleta de sabores e descobertas vínicas.",
@@ -19,7 +19,7 @@ List<EventModel> get mockedEvents => List.from(<EventModel>[
         totalSeats: 20,
       ),
       EventModel(
-        id: 2,
+        id: "2",
         title: "Workshop de Harmonização",
         desc: "Para quem se interessa em harmonizar vinho com comidas de natal",
         detailedDesc: "Participe do nosso Workshop de Harmonização, onde exploraremos a arte de combinar vinhos com as delícias culinárias típicas da época natalícia. Este evento é perfeito para aqueles que desejam aprimorar suas habilidades de harmonização e impressionar seus convidados durante as festividades. Durante o workshop, você aprenderá a identificar os sabores e características dos vinhos, bem como a escolher as melhores opções para acompanhar pratos tradicionais de Natal, como peru, bacalhau, rabanadas e muito mais. Nossos especialistas em vinhos irão guiá-lo através de degustações práticas e discussões interativas, proporcionando uma experiência educativa e divertida. Venha descobrir como elevar suas celebrações natalinas com a combinação perfeita de vinho e comida!",
@@ -35,7 +35,7 @@ List<EventModel> get mockedEvents => List.from(<EventModel>[
         totalSeats: 10
       ),
       EventModel(
-        id: 3,
+        id: "3",
         title: "Especial Beira Interior",
         desc:
             "Degustação aprofundada na região dos vinhos de altitude da Beira Interior",

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vinho/services/auth_service.dart';
 import 'package:vinho/theme/gradient_border_container.dart';
 import 'package:vinho/theme/ov_theme.dart';
 
@@ -141,9 +142,17 @@ class _LoginViewState extends State<LoginView> {
                                   ),
                                 ),
                               ),
-                              onPressed: () {
+                              onPressed: () async {
                                 if (_formKey.currentState!.saveAndValidate()) {
-                                  context.go('/');
+                                  final values = _formKey.currentState!.value;
+                                  final authService = AuthService();
+                                  final userCredential = await authService.signInWithEmailAndPassword(
+                                    values['email'],
+                                    values['password'],
+                                  );
+                                  if (userCredential != null) {
+                                    context.go('/');
+                                  }
                                 }
                               },
                               child: Text(

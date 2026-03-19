@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:go_router/go_router.dart';
 import 'package:vinho/model/lead_model.dart';
 import 'package:vinho/theme/ov_theme.dart';
 

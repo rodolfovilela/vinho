@@ -1,16 +1,27 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/l10n_helper/l10n_helper.dart';
 import 'package:vinho/model/event_model.dart';
 import 'package:vinho/theme/ov_theme.dart';
 import 'package:vinho/view/event_detail_view.dart';
 import 'package:vinho/view/events_view.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 import 'package:vinho/view/leads_view.dart';
 import 'package:vinho/view/login_view.dart';
 
-void main() {
+import 'firebase_options.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  
+  // Uncomment to seed mock events (run once)
+  // await SeedService.seedEvents();
+  
   runApp(const MyApp());
 }
 
