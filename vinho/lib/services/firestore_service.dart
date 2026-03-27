@@ -1,18 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:vinho/model/lead_model.dart';
+import 'package:vinho/model/config_model.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // Events collection
   CollectionReference get events => _db.collection('events');
-
-  // Leads collection  
+ 
   CollectionReference get leads => _db.collection('leads');
 
-  // Get all events
-  Stream<QuerySnapshot> getEventsStream() => events.orderBy('date').snapshots();
+  CollectionReference get config => _db.collection('config');
 
-  // Get single event
+Stream<QuerySnapshot> getEventsStream(String lang) => events/* .where("lang", isEqualTo: lang) */.where("status", isEqualTo: "A").orderBy('date').snapshots();
+
   Future<DocumentSnapshot?> getEvent(String id) async {
     try {
       return await events.doc(id).get();
@@ -22,7 +22,6 @@ class FirestoreService {
     }
   }
 
-  // Add event
   Future<DocumentReference> addEvent(Map<String, dynamic> data) async {
     try {
       return await events.add(data);
@@ -32,17 +31,59 @@ class FirestoreService {
     }
   }
 
-  // Get leads stream
-  Stream<QuerySnapshot> getLeadsStream() => leads.orderBy('createdAt', descending: true).snapshots();
+  Future<List<LeadModel>> getLeads(String lang) async {
+    try {
+      final snapshot = await leads
+          .where('lang', isEqualTo: lang)
+          .where('status', isEqualTo: 'A')
+          .orderBy('order')
+          .get();
+      return snapshot.docs.map((doc) => 
+        LeadModel.fromFirestore(doc.data() as Map<String, dynamic>, doc.id)
+      ).toList();
+    } catch (e) {
+      print('Get leads error: $e');
+      return [];
+    }
+  }
 
-  // Add lead
   Future<DocumentReference> addLead(Map<String, dynamic> data) async {
     try {
-      data['createdAt'] = FieldValue.serverTimestamp();
+     // data['createdAt'] = FieldValue.serverTimestamp();
       return await leads.add(data);
     } catch (e) {
       print('Add lead error: $e');
       rethrow;
+    }
+  }
+
+  Future<List<ConfigModel>> getConfigs(String lang) async {
+    try {
+      final snapshot = await config
+          .where('lang', isEqualTo: lang)
+          .where('status', isEqualTo: 'A')
+          .orderBy('create_datetime')
+          .get();
+      return snapshot.docs.map((doc) => 
+        ConfigModel.fromFirestore(doc)
+      ).toList();
+    } catch (e) {
+      print('Get configs error: $e');
+      return [];
+    }
+  }
+
+  Future<String?> getPrivacyPolicy(String lang) async {
+    try {
+      final configs = await getConfigs(lang);
+      final privacy = configs.firstWhere(
+        (c) => c.key == 'PRIVACY_POLICY',
+        orElse: () => null as ConfigModel,
+      );
+      return privacy?.content;
+    } catch (e) {
+      print('Get privacy policy error: $e');
+      return null;
     }
   }
 }

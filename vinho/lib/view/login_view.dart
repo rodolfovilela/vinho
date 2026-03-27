@@ -29,7 +29,7 @@ class _LoginViewState extends State<LoginView> {
           child: FittedBox(
             fit: BoxFit.contain,
             child: Image.asset(
-              'assets/images/glass.png',
+              '/assets/assets/images/glass.png',
               height: 40,
             ),
           ),

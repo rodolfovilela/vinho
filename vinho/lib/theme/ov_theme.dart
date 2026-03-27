@@ -131,7 +131,6 @@ class OVTheme {
   static const Color vaporwaveGray = Color.fromRGBO(42, 42, 58, 1);
   static const Color deepPurple = Color.fromRGBO(27, 11, 54, 1);
 
-
   static const Color backgroundColor = Color.fromRGBO(250, 248, 245, 1);
   static const Color primaryColor = Color.fromRGBO(45, 24, 16, 1);
   static const Color muted = Color.fromRGBO(112, 93, 82, 1);
@@ -140,13 +139,28 @@ class OVTheme {
   static const Color semiTransparent = Color.fromRGBO(109, 77, 58, 0.15);
   static const Color primaryBlack = Color.fromRGBO(45, 24, 16, 1);
   static const Color primaryRed = Color.fromRGBO(107, 40, 52, 1);
-  
 
-  static TextStyle bodyBase = GoogleFonts.lato(
-    color: OVTheme.vaporwaveGray, 
-    letterSpacing: 0.25
-  );
-  static TextStyle titlesBase = GoogleFonts.playfairDisplaySc(
-    color: OVTheme.vaporwaveGray
+  static TextStyle bodyBase =
+      GoogleFonts.lato(color: OVTheme.vaporwaveGray, letterSpacing: 0.25);
+  static TextStyle titlesBase =
+      GoogleFonts.playfairDisplay(color: OVTheme.vaporwaveGray);
+
+  static InputDecorationTheme inputDecorationTheme = InputDecorationTheme(
+    focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+      color: OVTheme.blackRetro,
+    )),
+    focusColor: OVTheme.primaryRed,
+    labelStyle:
+        OVTheme.bodyBase.copyWith(fontSize: 14, color: OVTheme.blackRetro),
+    hintStyle: OVTheme.bodyBase.copyWith(color: OVTheme.muted),
+    errorStyle: OVTheme.bodyBase.copyWith(color: OVTheme.primaryRed),
+    errorBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: OVTheme.primaryRed)),
+    focusedErrorBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: OVTheme.primaryRed)),
+    floatingLabelStyle: OVTheme.bodyBase
+        .copyWith(color: OVTheme.blackRetro, fontWeight: FontWeight.w600),
+    border: OutlineInputBorder(borderSide: BorderSide(color: OVTheme.blackRetro)),
   );
 }

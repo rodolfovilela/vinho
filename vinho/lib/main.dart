@@ -5,26 +5,28 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/l10n_helper/l10n_helper.dart';
 import 'package:vinho/model/event_model.dart';
-import 'package:vinho/model/lead_model.dart';
 import 'package:vinho/theme/ov_theme.dart';
+import 'package:vinho/view/booking_view.dart';
 import 'package:vinho/view/event_detail_view.dart';
 import 'package:vinho/view/events_view.dart';
 import 'package:vinho/view/leads_view.dart';
 import 'package:vinho/view/login_view.dart';
+import 'package:vinho/view/privacy_policy_view.dart';
+import 'package:vinho/widgets/logo.dart';
 
 import 'firebase_options.dart';
-
-List<LeadModel> leads = [];
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   // Uncomment to seed mock events (run once)
   // await SeedService.seedEvents();
-  
+
+  // await SeedService.disableEvents(); // Disable all events (for testing empty state)
+
   runApp(const MyApp());
 }
 
@@ -45,33 +47,7 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: 'leads',
           builder: (BuildContext context, GoRouterState state) {
-            if (leads.isEmpty) {
-              leads = leads = [
-                LeadModel(
-                  title: AppLocalizations.of(context)!.ourMissionTitle,
-                  description:
-                      AppLocalizations.of(context)!.ourMissionDesc,
-                  icon: Icons.adjust_outlined,
-                  //  route: '/leads',
-                ),
-                LeadModel(
-                  title: AppLocalizations.of(context)!.hostsTitle,
-                  description:
-                      AppLocalizations.of(context)!.hostsDesc,
-                  icon: Icons.storefront_outlined,
-                  //route: '/leads',
-                ),
-                LeadModel(
-                  title: AppLocalizations.of(context)!.sommeliersTitle,
-                  description:
-                      AppLocalizations.of(context)!.sommeliersDesc,
-                  icon: Icons.work_outline,
-                  // route: '/reports',
-                ),
-              ];
-            }
-
-            return const LeadsView();
+            return LeadsView();
           },
         ),
         GoRoute(
@@ -82,46 +58,57 @@ final GoRouter _router = GoRouter(
                 : const HomeScreen();
           },
         ),
+        GoRoute(
+          path: 'booking',
+          builder: (BuildContext context, GoRouterState state) {
+            return state.extra != null && state.extra is EventModel
+                ? BookingView(state.extra as EventModel)
+                : const HomeScreen();
+          },
+        ),
+        GoRoute(
+          path: 'privacy_policy',
+          builder: (BuildContext context, GoRouterState state) {
+            return state.extra != null && state.extra is EventModel
+                ? PrivacyPolicyView()
+                : const HomeScreen();
+          },
+        ),
       ],
     ),
   ],
 );
-
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-  return Scaffold(
+    return Scaffold(
       backgroundColor: OVTheme.backgroundColor,
-     
       appBar: AppBar(
         backgroundColor: OVTheme.lightBackground,
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
-        title: Container(
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: FittedBox(
-            fit: BoxFit.contain,
-            child: Image.asset(
-              'assets/images/glass.png',
-              height: kToolbarHeight * 0.8,
-            ),
+        title: SizedBox(
+          width: MediaQuery.of(context).size.width -
+              100, // Adjust width to center the logo
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [const AppLogo()],
           ),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.menu),
+            iconSize: 28,
             onPressed: () {
               context.push('/leads');
             },
           ),
         ],
       ),
-
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -130,7 +117,6 @@ class HomeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.max,
               children: [
-                
                 /* QuickSearchView(), 
                 SizedBox(height: 16), */
                 EventsView(),
@@ -164,6 +150,9 @@ class _MyAppState extends State<MyApp> {
           localChangeCallback: (l) => setState(() => locale = l),
           child: MaterialApp.router(
             locale: locale ?? deviceLocale,
+            theme: ThemeData(
+              inputDecorationTheme: OVTheme.inputDecorationTheme,
+            ),
             routerConfig: _router,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
@@ -187,4 +176,3 @@ class _MyAppState extends State<MyApp> {
     return lang.startsWith('pt') ? const Locale('pt') : const Locale('en');
   }
 }
-

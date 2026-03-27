@@ -15,16 +15,22 @@ class EventsView extends StatefulWidget {
 
 class _EventsViewState extends State<EventsView> {
   final ScrollController _scrollController = ScrollController();
-  List<EventModel> _events = [];
+  List<EventModel>? _events = null;
   late final FirestoreService _firestoreService;
 
   @override
   void initState() {
     super.initState();
     _firestoreService = FirestoreService();
-    _firestoreService.getEventsStream().listen((snapshot) {
-      setState(() {
-        _events = snapshot.docs.map((doc) => EventModel.fromFirestore(doc)).toList();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _firestoreService
+          .getEventsStream(Localizations.localeOf(context).languageCode)
+          .listen((snapshot) {
+        setState(() {
+          _events = snapshot.docs
+              .map((doc) => EventModel.fromFirestore(doc))
+              .toList();
+        });
       });
     });
   }
@@ -46,8 +52,8 @@ class _EventsViewState extends State<EventsView> {
       controller: _scrollController,
       thumbVisibility: true,
       trackVisibility: true,
-      thickness: 8,
-      minThumbLength: 50,
+      thickness: 3,
+    //  minThumbLength: 50,
       child: SingleChildScrollView(
         controller: _scrollController,
         child: Column(
@@ -61,10 +67,33 @@ class _EventsViewState extends State<EventsView> {
                 wordSpacing: 2,
               ),
             ),
-            if (_events.isEmpty)
+            if (_events == null)
+              SizedBox(
+                height: 200,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(64.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(color: OVTheme.primaryRed),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Carregando eventos...',
+                          style: OVTheme.bodyBase.copyWith(
+                            color: OVTheme.muted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            if (_events != null && _events!.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(64.0),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
                       Icons.event_busy,
@@ -73,7 +102,7 @@ class _EventsViewState extends State<EventsView> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Nenhum evento encontrado',
+                      AppLocalizations.of(context)!.noEventsForNow,
                       style: OVTheme.titlesBase.copyWith(
                         fontSize: 20,
                         color: OVTheme.muted,
@@ -81,7 +110,7 @@ class _EventsViewState extends State<EventsView> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Verifique mais tarde ou entre em contato conosco',
+                      AppLocalizations.of(context)!.sendEventSuggestion,
                       style: OVTheme.bodyBase.copyWith(
                         color: OVTheme.muted,
                       ),
@@ -89,22 +118,23 @@ class _EventsViewState extends State<EventsView> {
                     ),
                   ],
                 ),
-              )
-            else
-              ..._events.map((event) => GestureDetector(
-                onTap: () => context.go('/event_detail', extra: event),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: OVTheme.semiTransparent, width: 0.8),
+              ),
+            if (_events != null)
+              ..._events!.map((event) => GestureDetector(
+                    onTap: () => context.go('/event_detail', extra: event),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                              color: OVTheme.semiTransparent, width: 0.8),
+                        ),
+                        child: buildEventCard(event),
+                      ),
                     ),
-                    child: buildEventCard(event),
-                  ),
-                ),
-              )).toList(),
+                  ))
           ],
         ),
       ),
@@ -293,4 +323,3 @@ class _EventsViewState extends State<EventsView> {
     );
   }
 }
-

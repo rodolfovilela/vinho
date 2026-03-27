@@ -19,5 +19,17 @@ class SeedService {
 
     print('✅ Seeded ${mockedEvents.length} events to Firestore');
   }
+
+  static Future<void> disableEvents() async {
+    final firestore = FirestoreService();
+    
+    // Clear existing events
+    final snapshot = await firestore.events.get();
+    for (var doc in snapshot.docs) {
+      await doc.reference.update({"status": "I"});
+    }
+
+    print('✅ Disabled ${snapshot.docs.length} events in Firestore');
+  }
 }
 
