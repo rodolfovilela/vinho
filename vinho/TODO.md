@@ -1,6 +1,7 @@
-# Task Progress: Stepper-like with Pax Quantity in Booking Form
+# Task Progress: Save Booking to Firestore events/{eventId}/bookings subcollection
 
 ## Steps:
-- [x] 1. Add pax quantity selector with +/- buttons in bookingForm, before personal fields
-- [x] 2. Update validation and confirmation to include pax count
-- [x] 3. Test
+- [x] 1. Create BookingModel in lib/model/booking_model.dart
+- [x] 2. Add addBooking to FirestoreService for eventId subcollection
+- [x] 3. Update _showBookingConfirmation to save booking data instead of dialog
+- [ ] 4. Test

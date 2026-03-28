@@ -57,7 +57,7 @@ class _EventDetailViewState extends State<EventDetailView> {
               ),
             ),
             Positioned(
-              bottom: 20,
+              bottom: 4,
               left: 16,
               right: 16,
               child: SafeArea(

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/model/event_model.dart';
+import 'package:vinho/model/booking_model.dart';
+import 'package:vinho/services/firestore_service.dart';
 import 'package:vinho/theme/ov_theme.dart';
 import 'package:vinho/view/privacy_policy_view.dart';
 import 'package:vinho/widgets/dialog.dart';
@@ -21,6 +24,8 @@ class _BookingViewState extends State<BookingView> {
   final _countryCodeController = TextEditingController(text: '+351');
   bool _privacyConsent = false;
   int _paxCount = 1;
+  bool _isSubmitting = false;
+  late final FirestoreService _firestoreService;
 
   @override
   void didChangeDependencies() {
@@ -30,6 +35,7 @@ class _BookingViewState extends State<BookingView> {
   @override
   void initState() {
     super.initState();
+    _firestoreService = FirestoreService();
   }
 
   @override
@@ -40,30 +46,45 @@ class _BookingViewState extends State<BookingView> {
     super.dispose();
   }
 
-  void _showBookingConfirmation(BuildContext context) {
+  Future<void> _submitBooking() async {
     if (!_privacyConsent) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please accept the privacy policy.')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please accept the privacy policy.')),
+        );
+      }
       return;
     }
     if (_formKey.currentState!.validate()) {
-      //@TODO send the booking data to your backend or API
-      Navigator.pop(context); // Close the booking form
-      showDialog(
-        context: context,
-        builder: (context) => OVDialog(
-          //title: AppLocalizations.of(context)!.bookingConfirmed,
-          content: Text(
-              "Booking confirmed for ${_nameController.text}! ($_paxCount seats)"), // @TODO: Localize, add actions buttons
-          /*  actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context)!.close),
-            ),
-          ], */
-        ),
-      );
+      setState(() => _isSubmitting = true);
+      try {
+        final fullPhone = _countryCodeController.text + _phoneController.text;
+        final booking = BookingModel(
+          eventId: widget.event.id!,
+          paxCount: _paxCount,
+          name: _nameController.text,
+          email: _emailController.text,
+          phone: fullPhone,
+        );
+        await _firestoreService.addBooking(widget.event.id!, booking);
+        if (mounted) {
+          Navigator.pop(context);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Booking saved successfully!')),
+            );
+          }
+        }
+      } catch (e) {
+        if (kDebugMode) print('Booking submit error: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error saving booking. Try again.')),
+          );
+        }
+      } finally {
+        if (mounted) setState(() => _isSubmitting = false);
+      }
     }
   }
 
@@ -87,14 +108,15 @@ class _BookingViewState extends State<BookingView> {
               ),
             ),
             Positioned(
-              bottom: 20,
+              bottom: 4,
               left: 16,
               right: 16,
               child: SafeArea(
                 child: Column(
                   children: [
                     Text(
-                      "Restam apenas 8 vagas",
+                      AppLocalizations.of(context)!
+                          .onlySeatsLeft(widget.event.availableSeats.toString()),
                       style: OVTheme.bodyBase.copyWith(
                         color: OVTheme.muted,
                         fontSize: 11,
@@ -105,20 +127,31 @@ class _BookingViewState extends State<BookingView> {
                       margin: const EdgeInsets.only(top: 8),
                       width: double.infinity,
                       child: ElevatedButton(
-                          onPressed: () {
-                            _showBookingConfirmation(context);
-                          },
+                          onPressed: _isSubmitting ? null : _submitBooking,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: OVTheme.primaryRed,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(1),
                             ),
                             elevation: 4,
                           ),
-                          child: Text(AppLocalizations.of(context)!.bookNow,
-                              style: OVTheme.bodyBase.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500))),
+                          child: _isSubmitting
+                              ? SizedBox(
+                                  height: 16,
+                                  width: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  ),
+                                )
+                              : Text(AppLocalizations.of(context)!.bookNow,
+                                  style: OVTheme.bodyBase.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500))),
                     ),
                   ],
                 ),
@@ -158,7 +191,7 @@ class _BookingViewState extends State<BookingView> {
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: Row(
-            //  mainAxisAlignment: MainAxisAlignment.center,
+              //  mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   AppLocalizations.of(context)!.numberOfGuests,
@@ -168,7 +201,8 @@ class _BookingViewState extends State<BookingView> {
                   ),
                 ),
                 IconButton(
-                  onPressed: _paxCount > 1 ? () => setState(() => _paxCount--) : null,
+                  onPressed:
+                      _paxCount > 1 ? () => setState(() => _paxCount--) : null,
                   icon: Icon(Icons.remove, color: OVTheme.muted),
                 ),
                 Container(
@@ -278,7 +312,7 @@ class _BookingViewState extends State<BookingView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Usaremos seus dados apenas para gerir sua reserva e comunicar informações sobre o evento.",
+                AppLocalizations.of(context)!.privacyPolicyDisclaimer,
                 style: OVTheme.bodyBase.copyWith(
                   color: OVTheme.muted,
                   fontSize: 11,
@@ -309,9 +343,11 @@ class _BookingViewState extends State<BookingView> {
                           style: OVTheme.bodyBase
                               .copyWith(fontSize: 14, color: OVTheme.muted),
                           children: [
-                            const TextSpan(text: 'I have read and accept the '),
                             TextSpan(
-                              text: 'privacy policy',
+                                text:
+                                    '${AppLocalizations.of(context)!.iHaveReadAndAccept} '),
+                            TextSpan(
+                              text: AppLocalizations.of(context)!.privacyPolicy,
                               style: TextStyle(
                                   color: OVTheme.primaryRed,
                                   decoration: TextDecoration.underline,

@@ -4,6 +4,7 @@
   "searchButton": "Pesquisar",
   "searchHint": "Localização...",
   "seatsLeft": "{seatsLeft} lugares restantes",
+  "onlySeatsLeft": "Restam apenas {seatsLeft} lugares",
   "paxPrice": "{paxPrice} por pessoa",
   "freeEntrance":"Entrada gratuita",
   "aboutThisEvent": "Sobre o evento",
@@ -33,8 +34,7 @@
   "slogan1": "O vinho é mais do que uma bebida: é partilha.",
   "ourMissionTitle": "Nossa missão",
   "ourMissionDesc": "Conectar pessoas, espaços e talentos e criar uma comunidade <b>onde o vinho</b> acontece.",
-  "hostsTitle": "Seja o local do próximo evento",
-  "hostsDesc": "Tens um restaurante, bar ou espaço comercial e queres receber um dos nossos eventos?<br/><br/>Escreve-nos para hosts@ondeovinho.com e vamos falar sobre o teu espaço.",
-  "sommeliersTitle": "Para profissionais",
-  "sommeliersDesc": "Se és um escanção e queres partilhar seus conhecimentos e paixão pelo vinho, ofereça seu evento para a nossa comunidade.<br/><br/>Mostra-nos a tua paixão pelo vinho: partilha o teu conhecimento e propõe o teu evento por email.<br/>Escreve-nos para sommelier@ondeovinho.com"
+  "privacyPolicyDisclaimer": "Usaremos seus dados apenas para gerir sua reserva e comunicar informações sobre o evento.",
+  "iHaveReadAndAccept":"Li e aceito a",
+  "privacyPolicy":"política de privacidade"
 }

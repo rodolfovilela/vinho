@@ -16,9 +16,11 @@ class _PrivacyPolicyViewState extends State<PrivacyPolicyView> {
   bool _isLoading = true;
   String? _error;
 
+
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
     _loadPrivacyPolicy();
   }
 
@@ -26,10 +28,10 @@ class _PrivacyPolicyViewState extends State<PrivacyPolicyView> {
     try {
       final lang = L10nHelper.of(context).currentLocale().languageCode;
       final service = FirestoreService();
-      final content = await service.getPrivacyPolicy(lang);
+      final privacy = await service.getPrivacyPolicy(lang);
       if (mounted) {
         setState(() {
-          _privacyContent = content ?? 'Privacy policy not available.';
+          _privacyContent = privacy!.content ?? 'Privacy policy not available.';
           _isLoading = false;
         });
       }
@@ -62,7 +64,9 @@ class _PrivacyPolicyViewState extends State<PrivacyPolicyView> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(_error!, style: OVTheme.bodyBase.copyWith(color: OVTheme.muted)),
+                        Text(_error!,
+                            style: OVTheme.bodyBase
+                                .copyWith(color: OVTheme.muted)),
                         const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: _loadPrivacyPolicy,
@@ -72,7 +76,8 @@ class _PrivacyPolicyViewState extends State<PrivacyPolicyView> {
                     ),
                   )
                 : SingleChildScrollView(
-                    padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
+                    padding:
+                        const EdgeInsets.only(left: 16, right: 16, bottom: 24),
                     child: HtmlWidget(
                       _privacyContent!,
                       textStyle: OVTheme.bodyBase.copyWith(
