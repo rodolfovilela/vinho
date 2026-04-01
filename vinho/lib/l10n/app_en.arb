@@ -34,7 +34,10 @@
   "slogan1": "Wine is more than a drink: it’s about sharing.",
   "ourMissionTitle": "Our mission",
   "ourMissionDesc": "Connecting people, spaces, and talents, and creating a community <b>where wine</b> happens.",
+  "bookingSuccessfullyDone":"Reservation confirmed. See you soon!",
+  "bookingError": "We're sorry we couldn't reserve your seats at this moment",
   "privacyPolicyDisclaimer": "We will only use your data to manage your booking and communicate information about the event.",
+  "privacyPolicyError":"Please accept the privacy policy.",
   "iHaveReadAndAccept":"I have read and accept the",
   "privacyPolicy":"Privacy Policy"
 }

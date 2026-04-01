@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:vinho/util/firestore_parser.dart';
 
 class BookingModel {
   final String? id;
   final String eventId;
-  final int paxCount;
+  final int seats;
   final String name;
   final String email;
   final String phone;
@@ -12,7 +13,7 @@ class BookingModel {
   BookingModel({
     this.id,
     required this.eventId,
-    required this.paxCount,
+    required this.seats,
     required this.name,
     required this.email,
     required this.phone,
@@ -29,7 +30,7 @@ class BookingModel {
     return BookingModel(
       id: json['id'] as String?,
       eventId: json['eventId'] as String,
-      paxCount: json['paxCount'] as int,
+      seats: FirestoreParser.toInt(json['seats'] ?? 0),
       name: json['name'] as String,
       email: json['email'] as String,
       phone: json['phone'] as String,
@@ -40,11 +41,10 @@ class BookingModel {
   Map<String, dynamic> toJson() {
     return {
       'eventId': eventId,
-      'paxCount': paxCount,
+      'seats': seats,
       'name': name,
       'email': email,
       'phone': phone,
-      'createdAt': FieldValue.serverTimestamp(),
     };
   }
 }

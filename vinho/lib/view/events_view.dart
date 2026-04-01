@@ -15,7 +15,7 @@ class EventsView extends StatefulWidget {
 
 class _EventsViewState extends State<EventsView> {
   final ScrollController _scrollController = ScrollController();
-  List<EventModel>? _events = null;
+  List<EventModel>? _events;
   late final FirestoreService _firestoreService;
 
   @override
@@ -52,8 +52,9 @@ class _EventsViewState extends State<EventsView> {
       controller: _scrollController,
       thumbVisibility: true,
       trackVisibility: true,
-      thickness: 3,
-    //  minThumbLength: 50,
+      //  radius: Radius.circular(8),
+      thumbColor: OVTheme.primaryRed,
+      thickness: 2,
       child: SingleChildScrollView(
         controller: _scrollController,
         child: Column(

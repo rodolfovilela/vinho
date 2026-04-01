@@ -15,7 +15,7 @@ List<EventModel> get mockedEvents => List.from(<EventModel>[
         sommelierName: "<b>João Silva</b> (sommelier) e<br/><b>Maria Fernandes</b> (hostess)",  
         sommelierImgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Sommelier_F.I.S.A.R..jpg/330px-Sommelier_F.I.S.A.R..jpg',
         paxPrice: 25,
-        availableSeats: 10,
+        bookedSeats: 10,
         totalSeats: 20,
       ),
       EventModel(
@@ -31,7 +31,7 @@ List<EventModel> get mockedEvents => List.from(<EventModel>[
         hostName: "Pizzaria Chica Pimenta",
         sommelierName: "Maria Fernandes",
         paxPrice: 25,
-        availableSeats: 2,
+        bookedSeats: 2,
         totalSeats: 10
       ),
       EventModel(
@@ -49,7 +49,7 @@ List<EventModel> get mockedEvents => List.from(<EventModel>[
         hostName: "Restaurante A Caldeira",
         sommelierName: "<b>João Silva</b> e <b>Maria Fernandes</b>" ,
         paxPrice: 25,
-        availableSeats: 3,
+        bookedSeats: 3,
         totalSeats: 15
       ),
       EventModel(
@@ -66,7 +66,7 @@ List<EventModel> get mockedEvents => List.from(<EventModel>[
           region: "Lisboa",
           paxPrice: 25,
           totalSeats: 50,
-          availableSeats: 40),
+          bookedSeats: 40),
       EventModel(
         title: "Experiência Casal Garcia",
         desc:
@@ -79,7 +79,7 @@ List<EventModel> get mockedEvents => List.from(<EventModel>[
         region: "Norte",
         hostName: "Casal Garcia",
         paxPrice: 25,
-        availableSeats: 10,
+        bookedSeats: 10,
       ),
       EventModel(
         title: "Vinho na Vila 2026",
@@ -92,7 +92,7 @@ List<EventModel> get mockedEvents => List.from(<EventModel>[
         region: "Alentejo",
         hostName: "Vila Alva",
         paxPrice: 25,
-        availableSeats: 234,
+        bookedSeats: 234,
       ),
       EventModel(
         title: "Essência do Vinho — Porto",
@@ -104,7 +104,7 @@ List<EventModel> get mockedEvents => List.from(<EventModel>[
         address: "Palácio da Bolsa, Porto",
         region: "Norte",
         paxPrice: 25,
-        availableSeats: 5,
+        bookedSeats: 5,
       ),
       EventModel(
         title: "Porto and Douro Valley Festival",
@@ -116,7 +116,7 @@ List<EventModel> get mockedEvents => List.from(<EventModel>[
         address: "Porto e Douro Valley",
         region: "Norte",
         paxPrice: 25,
-        availableSeats: 189,
+        bookedSeats: 189,
       ),
       EventModel(
           title: "Douro & Porto Wine Festival",

@@ -87,7 +87,7 @@ Stream<QuerySnapshot> getEventsStream(String lang) => events/* .where("lang", is
     }
   }
 
-  Future<DocumentReference> addBooking(String eventId, BookingModel booking) async {
+  /* Future<DocumentReference> addBooking(String eventId, BookingModel booking) async {
     try {
       await FirebaseAuth.instance.signInAnonymously();
       return await events.doc(eventId).collection('bookings').add(booking.toJson());
@@ -95,5 +95,5 @@ Stream<QuerySnapshot> getEventsStream(String lang) => events/* .where("lang", is
       print('Add booking error: $e');
       rethrow;
     }
-  }
+  } */
 }

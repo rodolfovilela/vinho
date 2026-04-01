@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
-import 'package:vinho/model/event_model.dart';
 import 'package:vinho/model/booking_model.dart';
-import 'package:vinho/services/firestore_service.dart';
+import 'package:vinho/model/event_model.dart';
+import 'package:vinho/services/functions_service.dart';
+import 'package:vinho/services/toast_service.dart';
 import 'package:vinho/theme/ov_theme.dart';
 import 'package:vinho/view/privacy_policy_view.dart';
-import 'package:vinho/widgets/dialog.dart';
 
 class BookingView extends StatefulWidget {
   final EventModel event;
@@ -25,7 +25,7 @@ class _BookingViewState extends State<BookingView> {
   bool _privacyConsent = false;
   int _paxCount = 1;
   bool _isSubmitting = false;
-  late final FirestoreService _firestoreService;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void didChangeDependencies() {
@@ -35,7 +35,7 @@ class _BookingViewState extends State<BookingView> {
   @override
   void initState() {
     super.initState();
-    _firestoreService = FirestoreService();
+    //_firestoreService = FirestoreService();
   }
 
   @override
@@ -47,31 +47,49 @@ class _BookingViewState extends State<BookingView> {
   }
 
   Future<void> _submitBooking() async {
+    print('🔥 _submitBooking called');
     if (!_privacyConsent) {
+      print('❌ Privacy consent missing');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please accept the privacy policy.')),
+        ToastService.error(
+          context,
+          AppLocalizations.of(context)!.privacyPolicyError,
         );
       }
       return;
     }
+    print('✅ Privacy OK');
     if (_formKey.currentState!.validate()) {
+      print('✅ Form validated');
       setState(() => _isSubmitting = true);
       try {
+        print('📋 Creating booking, event.id: ${widget.event.id}');
         final fullPhone = _countryCodeController.text + _phoneController.text;
         final booking = BookingModel(
           eventId: widget.event.id!,
-          paxCount: _paxCount,
+          seats: _paxCount,
           name: _nameController.text,
           email: _emailController.text,
           phone: fullPhone,
         );
-        await _firestoreService.addBooking(widget.event.id!, booking);
+
+        print('🚀 Calling FunctionsService.bookSeats...');
+
+        bool ret = await FunctionsService.bookSeats(widget.event.id!, booking);
+        print('✅ bookSeats returned: $ret');
+
         if (mounted) {
-          Navigator.pop(context);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Booking saved successfully!')),
+          if (ret) {
+            Navigator.pop(context);
+
+            ToastService.success(
+              context,
+              AppLocalizations.of(context)!.bookingSuccessfullyDone,
+            );
+          } else {
+             ToastService.error(
+              context,
+              AppLocalizations.of(context)!.bookingError,
             );
           }
         }
@@ -99,12 +117,20 @@ class _BookingViewState extends State<BookingView> {
       body: SafeArea(
         child: Stack(
           children: [
-            SingleChildScrollView(
-              child: Container(
-                height: MediaQuery.of(context).size.height - kToolbarHeight,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                child: bookingForm(),
+            RawScrollbar(
+              controller: _scrollController,
+          thumbVisibility: true,
+          trackVisibility: true,
+          //  radius: Radius.circular(8),
+          thumbColor: OVTheme.primaryRed,
+          thickness: 2,
+              child: SingleChildScrollView(
+                child: Container(
+                  height: MediaQuery.of(context).size.height - kToolbarHeight,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                  child: bookingForm(),
+                ),
               ),
             ),
             Positioned(
@@ -115,8 +141,8 @@ class _BookingViewState extends State<BookingView> {
                 child: Column(
                   children: [
                     Text(
-                      AppLocalizations.of(context)!
-                          .onlySeatsLeft(widget.event.availableSeats.toString()),
+                      AppLocalizations.of(context)!.onlySeatsLeft(
+                          widget.event.availableSeats ?? 0),
                       style: OVTheme.bodyBase.copyWith(
                         color: OVTheme.muted,
                         fontSize: 11,

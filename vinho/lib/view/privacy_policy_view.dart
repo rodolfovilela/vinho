@@ -15,7 +15,7 @@ class _PrivacyPolicyViewState extends State<PrivacyPolicyView> {
   String? _privacyContent;
   bool _isLoading = true;
   String? _error;
-
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void didChangeDependencies() {
@@ -75,18 +75,26 @@ class _PrivacyPolicyViewState extends State<PrivacyPolicyView> {
                       ],
                     ),
                   )
-                : SingleChildScrollView(
-                    padding:
-                        const EdgeInsets.only(left: 16, right: 16, bottom: 24),
-                    child: HtmlWidget(
-                      _privacyContent!,
-                      textStyle: OVTheme.bodyBase.copyWith(
-                        color: OVTheme.muted,
-                        fontSize: 13,
+                : RawScrollbar(
+                  controller: _scrollController,
+          thumbVisibility: true,
+          trackVisibility: true,
+          //  radius: Radius.circular(8),
+          thumbColor: OVTheme.primaryRed,
+          thickness: 2,
+                  child: SingleChildScrollView(
+                      padding:
+                          const EdgeInsets.only(left: 16, right: 16, bottom: 24),
+                      child: HtmlWidget(
+                        _privacyContent!,
+                        textStyle: OVTheme.bodyBase.copyWith(
+                          color: OVTheme.muted,
+                          fontSize: 13,
+                        ),
+                        buildAsync: false,
                       ),
-                      buildAsync: false,
                     ),
-                  ),
+                ),
       ),
     );
   }

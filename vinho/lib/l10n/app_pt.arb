@@ -34,7 +34,10 @@
   "slogan1": "O vinho é mais do que uma bebida: é partilha.",
   "ourMissionTitle": "Nossa missão",
   "ourMissionDesc": "Conectar pessoas, espaços e talentos e criar uma comunidade <b>onde o vinho</b> acontece.",
+  "bookingSuccessfullyDone":"Reserva efetuada. Até já!",
+  "bookingError": "Lamentamos mas não foi possível reservar seus lugares",
   "privacyPolicyDisclaimer": "Usaremos seus dados apenas para gerir sua reserva e comunicar informações sobre o evento.",
+  "privacyPolicyError":"Por favor, aceite a política de privacidade.",
   "iHaveReadAndAccept":"Li e aceito a",
   "privacyPolicy":"política de privacidade"
 }

@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:vinho/theme/ov_theme.dart';
 
 class OVDialog extends StatelessWidget {
-  const OVDialog({super.key, required this.content});
+  OVDialog({super.key, required this.content});
   final Widget content;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +14,7 @@ class OVDialog extends StatelessWidget {
       filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
       child: AlertDialog(
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-        backgroundColor: Colors.transparent,
+        backgroundColor: OVTheme.backgroundColor,
         surfaceTintColor: OVTheme.backgroundColor,
         insetPadding: EdgeInsets.zero,
         title: Align(
@@ -21,7 +22,7 @@ class OVDialog extends StatelessWidget {
           child: GestureDetector(
             child: const Icon(
               Icons.cancel_outlined,
-              color: Colors.white,
+              color: OVTheme.primaryRed,
             ),
             onTap: () {
               Navigator.of(context).pop();
@@ -30,10 +31,24 @@ class OVDialog extends StatelessWidget {
         ),
         content: SizedBox(
             width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height * 0.8,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [content],
+              children: [
+                Expanded(
+                  child: RawScrollbar(
+                    controller: _scrollController,
+                    thumbVisibility: true,
+                    trackVisibility: true,
+                    //  radius: Radius.circular(8),
+                    thumbColor: OVTheme.primaryRed,
+                    thickness: 2,
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      child: content,
+                    ),
+                  ),
+                ),
+              ],
             )),
       ),
     );

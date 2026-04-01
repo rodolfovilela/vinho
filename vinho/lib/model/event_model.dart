@@ -2,8 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EventModel {
   static EventModel fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data() as Map<String, dynamic>;
+
+    final data = Map<String, dynamic>.from(raw);
+
     data['id'] = doc.id;
+
     return EventModel.fromJson(data);
   }
 
@@ -22,10 +26,10 @@ class EventModel {
       hostName: json['hostName'] as String?,
       sommelierName: json['sommelierName'] as String?,
       sommelierImgUrl: json['sommelierImgUrl'] as String?,
-      order: json['order'] as int?,
+      order: (json['order'] as dynamic?)?.toInt(),
       paxPrice: (json['paxPrice'] as num?)?.toDouble(),
-      availableSeats: json['availableSeats'] as int?,
-      totalSeats: json['totalSeats'] as int?,
+      bookedSeats: (json['bookedSeats'] as dynamic)?.toInt(),
+      totalSeats: (json['totalSeats'] as dynamic)?.toInt(),
     );
   }
 
@@ -46,7 +50,7 @@ class EventModel {
       'sommelierImgUrl': sommelierImgUrl,
       'order': order,
       'paxPrice': paxPrice,
-      'availableSeats': availableSeats,
+      'bookedSeats': bookedSeats,
       'totalSeats': totalSeats,
     };
   }
@@ -66,7 +70,7 @@ class EventModel {
   String? sommelierImgUrl;
   int? order;
   double? paxPrice;
-  int? availableSeats;
+  int? bookedSeats;
   int? totalSeats;
 
   EventModel({
@@ -85,8 +89,12 @@ class EventModel {
     this.sommelierImgUrl,
     this.time,
     this.paxPrice,
-    this.availableSeats,
+    this.bookedSeats,
     this.totalSeats,
   });
-}
 
+  get availableSeats {
+    if (totalSeats == null) return 0;
+    return totalSeats! - bookedSeats!;
+  }
+}

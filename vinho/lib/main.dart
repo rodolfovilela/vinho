@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +6,8 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/l10n_helper/l10n_helper.dart';
 import 'package:vinho/model/event_model.dart';
+import 'package:vinho/services/auth_service.dart';
+import 'package:vinho/services/functions_service.dart';
 import 'package:vinho/theme/ov_theme.dart';
 import 'package:vinho/view/booking_view.dart';
 import 'package:vinho/view/event_detail_view.dart';
@@ -27,7 +30,9 @@ void main() async {
 
   // await SeedService.disableEvents(); // Disable all events (for testing empty state)
 
-  runApp(const MyApp());
+  AuthService.ensureAuth().then((_) {
+    runApp(const MyApp());
+  });
 }
 
 final GoRouter _router = GoRouter(
@@ -35,7 +40,7 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return const HomeScreen();
+        return  HomeScreen();
       },
       routes: <RouteBase>[
         GoRoute(
@@ -55,7 +60,7 @@ final GoRouter _router = GoRouter(
           builder: (BuildContext context, GoRouterState state) {
             return state.extra != null && state.extra is EventModel
                 ? EventDetailView(state.extra as EventModel)
-                : const HomeScreen();
+                :  HomeScreen();
           },
         ),
         GoRoute(
@@ -63,7 +68,7 @@ final GoRouter _router = GoRouter(
           builder: (BuildContext context, GoRouterState state) {
             return state.extra != null && state.extra is EventModel
                 ? BookingView(state.extra as EventModel)
-                : const HomeScreen();
+                :  HomeScreen();
           },
         ),
         GoRoute(
@@ -71,7 +76,7 @@ final GoRouter _router = GoRouter(
           builder: (BuildContext context, GoRouterState state) {
             return state.extra != null && state.extra is EventModel
                 ? PrivacyPolicyView()
-                : const HomeScreen();
+                :  HomeScreen();
           },
         ),
       ],
@@ -80,7 +85,9 @@ final GoRouter _router = GoRouter(
 );
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +102,7 @@ class HomeScreen extends StatelessWidget {
           width: MediaQuery.of(context).size.width -
               100, // Adjust width to center the logo
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [const AppLogo()],
           ),
         ),
@@ -110,17 +117,26 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                /* QuickSearchView(), 
-                SizedBox(height: 16), */
-                EventsView(),
-              ],
+        child: RawScrollbar(
+          controller: _scrollController,
+          thumbVisibility: true,
+          trackVisibility: true,
+          //  radius: Radius.circular(8),
+          thumbColor: OVTheme.primaryRed,
+          thickness: 2,
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  /* QuickSearchView(), 
+                  SizedBox(height: 16), */
+                  EventsView(),
+                ],
+              ),
             ),
           ),
         ),
