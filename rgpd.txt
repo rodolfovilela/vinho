@@ -1,0 +1,102 @@
+Texto curto para o formulário (UX-friendly)
+
+Seção:
+
+Seus dados
+
+Subtexto (opcional):
+
+Usaremos seus dados apenas para gerir sua reserva e comunicar informações sobre o evento.
+
+✅ 2️⃣ Checkbox de consentimento (obrigatório)
+
+☐ Li e aceito a Política de Privacidade
+
+💡 Dica: “Política de Privacidade” deve ser clicável.
+
+✅ 3️⃣ Mensagem após reserva (confirmação)
+
+✅ Reserva confirmada!
+Enviaremos atualizações sobre o evento para o seu email ou telefone.
+
+✅ 4️⃣ Política de Privacidade (versão completa – pronta para uso)
+
+Você pode colocar isso numa página do app ou site:
+
+🔒 Política de Privacidade
+
+1. Responsável pelo tratamento
+[Nome da empresa/projeto], com contacto em [email@email.com
+].
+
+2. Dados recolhidos
+Recolhemos os seguintes dados pessoais:
+
+Nome
+Endereço de email
+Número de telefone
+
+3. Finalidade do tratamento
+Os dados são utilizados para:
+
+Gestão de reservas em eventos
+Comunicação com os participantes (confirmações, alterações, lembretes)
+
+4. Base legal
+O tratamento dos dados baseia-se:
+
+No seu consentimento
+Na necessidade de execução do serviço (reserva no evento)
+
+5. Partilha de dados
+Os dados não serão vendidos nem partilhados com terceiros, exceto quando necessário para a realização do evento ou cumprimento de obrigações legais.
+
+6. Conservação dos dados
+Os dados serão conservados apenas pelo tempo necessário para a gestão do evento, sendo posteriormente eliminados, salvo obrigação legal em contrário.
+
+7. Direitos do utilizador
+Nos termos do RGPD, tem o direito de:
+
+Aceder aos seus dados
+Retificar dados incorretos
+Solicitar a eliminação dos dados
+Retirar o consentimento
+
+Para exercer os seus direitos, contacte: [email@email.com
+]
+
+8. Segurança
+Adotamos medidas técnicas e organizativas adequadas para proteger os seus dados pessoais.
+
+✅ 5️⃣ Botão para apagar dados (ou alternativa simples)
+Opção simples (suficiente para MVP)
+
+Apagar meus dados
+
+Ao clicar:
+
+“Para apagar seus dados, envie um email para [email@email.com
+]”
+
+Opção melhor (mais profissional)
+Botão direto na app:
+
+Eliminar conta / dados
+
+✅ 6️⃣ Microcopy extra (detalhes que fazem diferença)
+
+Campo telefone (opcional):
+
+Usado apenas para comunicações sobre o evento
+
+Erro se não aceitar política:
+
+É necessário aceitar a Política de Privacidade
+
+🎯 Resultado final
+
+Com isso, seu app fica:
+
+✔ Compatível com RGPD (nível prático/MVP)
+✔ Claro e confiável para o usuário
+✔ Otimizado para conversão (sem assustar com juridiquês)
