@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/model/event_model.dart';
@@ -50,7 +51,7 @@ class _EventDetailViewState extends State<EventDetailView> {
               trackVisibility: true,
               //  radius: Radius.circular(8),
               thumbColor: OVTheme.primaryRed,
-              thickness: 2,
+              thickness: 4,
               child: SingleChildScrollView(
                 controller: _scrollController,
                 child: buildEventCard(widget.event),
@@ -383,6 +384,31 @@ class _EventDetailViewState extends State<EventDetailView> {
                   ],
                 ),
               ),
+              if (event.hasMinimumPaxRequired &&
+                  event.hasDeadlineForMinimumPax) ...[
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: OVTheme.semiTransparent,
+                    ),
+                  ),
+                  padding: const EdgeInsets.all(16.0),
+                  margin: const EdgeInsets.only(top: 32.0),
+                  width: double.infinity,
+                  child: Text(
+                      AppLocalizations.of(context)!
+                          .minimumPaxRequiredWithDeadlineDisclaimer(
+                        DateFormat.yMMMMd()
+                            .add_jm()
+                            .format(event.deadlineForMinimumPax!),
+                        event.minimumPaxRequired.toString(),
+                      ),
+                      style: OVTheme.bodyBase.copyWith(
+                        color: OVTheme.muted,
+                        fontSize: 13,
+                      )),
+                ),
+              ],
               const SizedBox(height: 60),
             ]));
   }

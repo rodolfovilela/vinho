@@ -30,6 +30,10 @@ class EventModel {
       paxPrice: (json['paxPrice'] as num?)?.toDouble(),
       bookedSeats: (json['bookedSeats'] as dynamic)?.toInt(),
       totalSeats: (json['totalSeats'] as dynamic)?.toInt(),
+      minimumPaxRequired: (json['minimumPaxRequired'] as dynamic)?.toInt(),
+      maxSeatsPerBooking: (json['maxSeatsPerBooking'] as dynamic)?.toInt(),
+      deadlineForMinimumPax:
+          (json['deadlineForMinimumPax'] as Timestamp?)?.toDate(),
     );
   }
 
@@ -52,6 +56,9 @@ class EventModel {
       'paxPrice': paxPrice,
       'bookedSeats': bookedSeats,
       'totalSeats': totalSeats,
+      'minimumPaxRequired': minimumPaxRequired,
+      'maxSeatsPerBooking': maxSeatsPerBooking,
+      'deadlineForMinimumPax': deadlineForMinimumPax,
     };
   }
 
@@ -72,6 +79,9 @@ class EventModel {
   double? paxPrice;
   int? bookedSeats;
   int? totalSeats;
+  int? minimumPaxRequired;
+  DateTime? deadlineForMinimumPax;
+  int? maxSeatsPerBooking;
 
   EventModel({
     this.id,
@@ -91,10 +101,18 @@ class EventModel {
     this.paxPrice,
     this.bookedSeats,
     this.totalSeats,
+    this.maxSeatsPerBooking,
+    this.minimumPaxRequired,
+    this.deadlineForMinimumPax,
   });
 
-  get availableSeats {
+  int get availableSeats {
     if (totalSeats == null) return 0;
     return totalSeats! - bookedSeats!;
   }
+  
+  bool get isFullyBooked => availableSeats <= 0;
+  bool get hasMaxSeatsPerBooking => maxSeatsPerBooking != null;
+  bool get hasMinimumPaxRequired => minimumPaxRequired != null;
+  bool get hasDeadlineForMinimumPax => deadlineForMinimumPax != null;
 }

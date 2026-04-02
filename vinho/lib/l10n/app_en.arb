@@ -39,6 +39,11 @@
   "privacyPolicyDisclaimer": "We will only use your data to manage your booking and communicate information about the event.",
   "privacyPolicyError":"Please accept the privacy policy.",
   "iHaveReadAndAccept":"I have read and accept the",
-  "privacyPolicy":"Privacy Policy"
+  "privacyPolicy":"Privacy Policy",
+  "minimumPaxRequiredWithDeadlineDisclaimer": "This event needs, at least, {minimumPaxRequired} booked seats to be confirmed. We will let you know if it's going to happen by {deadlineForMinimumPax}",
+  "bookingSummaryTitle":"Booking submitted",
+  "maxSeatsPerBooking": "Maximum of {maxSeatsPerBooking} seats per booking",
+  "bookingSummarySeats": "{bookingSummarySeats} seats reserved",
+  "emailBookingConfirmationWarning": "A confirmation email was sent to {email}. Your seat(s) will only be confirmed after you verify your email."
 }
 

@@ -54,7 +54,7 @@ class _EventsViewState extends State<EventsView> {
       trackVisibility: true,
       //  radius: Radius.circular(8),
       thumbColor: OVTheme.primaryRed,
-      thickness: 2,
+      thickness: 4,
       child: SingleChildScrollView(
         controller: _scrollController,
         child: Column(

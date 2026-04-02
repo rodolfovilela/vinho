@@ -76,15 +76,15 @@ class _PrivacyPolicyViewState extends State<PrivacyPolicyView> {
                     ),
                   )
                 : RawScrollbar(
-                  controller: _scrollController,
-          thumbVisibility: true,
-          trackVisibility: true,
-          //  radius: Radius.circular(8),
-          thumbColor: OVTheme.primaryRed,
-          thickness: 2,
-                  child: SingleChildScrollView(
-                      padding:
-                          const EdgeInsets.only(left: 16, right: 16, bottom: 24),
+                    controller: _scrollController,
+                    thumbVisibility: true,
+                    trackVisibility: true,
+                    //  radius: Radius.circular(8),
+                    thumbColor: OVTheme.primaryRed,
+                    thickness: 4,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.only(
+                          left: 16, right: 16, bottom: 24),
                       child: HtmlWidget(
                         _privacyContent!,
                         textStyle: OVTheme.bodyBase.copyWith(
@@ -94,7 +94,7 @@ class _PrivacyPolicyViewState extends State<PrivacyPolicyView> {
                         buildAsync: false,
                       ),
                     ),
-                ),
+                  ),
       ),
     );
   }

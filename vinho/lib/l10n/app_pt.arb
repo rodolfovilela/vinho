@@ -39,5 +39,10 @@
   "privacyPolicyDisclaimer": "Usaremos seus dados apenas para gerir sua reserva e comunicar informações sobre o evento.",
   "privacyPolicyError":"Por favor, aceite a política de privacidade.",
   "iHaveReadAndAccept":"Li e aceito a",
-  "privacyPolicy":"política de privacidade"
+  "privacyPolicy":"política de privacidade",
+  "minimumPaxRequiredWithDeadlineDisclaimer":"Este evento requer, no mínimo, {minimumPaxRequired} assentos reservados para ser confirmado. Informaremos se ele será realizado até o dia {deadlineForMinimumPax}.",
+  "bookingSummaryTitle":"Reserva efetuada",
+  "maxSeatsPerBooking": "Máximo de {maxSeatsPerBooking} lugares por reserva",
+  "bookingSummarySeats": "{bookingSummarySeats} lugares reservados",
+  "emailBookingConfirmationWarning": "Enviámos um email de confirmação para {email}. Os seus lugares só serão confirmados depois de verificar o email."
 }

@@ -38,7 +38,7 @@ class LeadsView extends StatelessWidget {
           trackVisibility: true,
           //  radius: Radius.circular(8),
           thumbColor: OVTheme.primaryRed,
-          thickness: 2,
+          thickness: 4,
           child: SingleChildScrollView(
             controller: _scrollControllerA,
             padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
@@ -59,8 +59,6 @@ class LeadsView extends StatelessWidget {
                   margin: const EdgeInsets.only(bottom: 24),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                      //color: Colors.white,
-                      //  border:                      Border.all(color: OVTheme.semiTransparent, width: 0.8),
                       border: BorderDirectional(
                     bottom:
                         BorderSide(color: OVTheme.semiTransparent, width: 0.8),
@@ -123,36 +121,6 @@ class LeadsView extends StatelessWidget {
                       );
                     }
                     final leads = snapshot.data ?? [];
-                    /*  if (leads.isEmpty) {
-                      return Padding(
-                        padding: const EdgeInsets.all(64.0),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.contact_mail,
-                              size: 64,
-                              color: OVTheme.muted,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Nenhuma oportunidade disponível',
-                              style: OVTheme.titlesBase.copyWith(
-                                fontSize: 20,
-                                color: OVTheme.muted,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Verifique mais tarde ou entre em contato conosco',
-                              style: OVTheme.bodyBase.copyWith(
-                                color: OVTheme.muted,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      );
-                    } */
                     if (leads.isNotEmpty) {
                       return Wrap(
                         spacing: 16,
@@ -166,18 +134,7 @@ class LeadsView extends StatelessWidget {
                                           30
                                       : double.infinity,
                                   child: Container(
-                                    decoration: BoxDecoration(
-                                        /* border: BorderDirectional(
-                                        bottom: BorderSide(
-                                            color: isWide ? Colors.transparent: OVTheme.semiTransparent,
-                                            width: 0.8),
-                                      ), */
-                                        /* color: Colors.white,
-                                      border: Border.all(
-                                          color: OVTheme.semiTransparent,
-                                          width: 0.8),
-                                      borderRadius: BorderRadius.circular(12), */
-                                        ),
+                                    decoration: BoxDecoration(),
                                     child: Padding(
                                       padding: const EdgeInsets.all(12.0),
                                       child: Column(
@@ -262,7 +219,7 @@ class LeadsView extends StatelessWidget {
                                                             //  radius: Radius.circular(8),
                                                             thumbColor: OVTheme
                                                                 .primaryRed,
-                                                            thickness: 2,
+                                                            thickness: 4,
                                                             //   minThumbLength: 50,
                                                             child:
                                                                 SingleChildScrollView(
@@ -306,75 +263,7 @@ class LeadsView extends StatelessWidget {
                                                             .close),
                                                   ), */
                                                       ],
-                                                    )) /* AlertDialog(
-                                                backgroundColor:
-                                                    OVTheme.backgroundColor,
-                                                title: Text(
-                                                  lead.title,
-                                                  style:
-                                                      OVTheme.titlesBase.copyWith(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: OVTheme.primaryRed,
-                                                  ),
-                                                ),
-                                                content: Container(
-                                                  width: double.infinity,
-                                                  //     padding: const EdgeInsets.all(16),
-                                                  decoration: BoxDecoration(
-                                                      //    color: OVTheme.lightBackground,
-                                                      //  borderRadius: BorderRadius.circular(12),
-                                                      /*       border: Border.all(
-                                                      color: OVTheme.semiTransparent,
-                                                      width: 0.8,
-                                                    ), */
-                                                      ),
-                                                  child: RawScrollbar(
-                                                    controller: _scrollController,
-                                                    thumbVisibility: true,
-                                                    trackVisibility: true,
-                                                    //  radius: Radius.circular(8),
-                                                    thumbColor:
-                                                        OVTheme.primaryRed,
-                                                    thickness: 2,
-                                                    //   minThumbLength: 50,
-                                                    child: SingleChildScrollView(
-                                                      controller:
-                                                          _scrollController,
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets.only(
-                                                                right: 16),
-                                                        child: HtmlWidget(
-                                                          lead.description,
-                                                          textStyle: OVTheme
-                                                              .bodyBase
-                                                              .copyWith(
-                                                            color: OVTheme.muted,
-                                                            fontSize: 13,
-                                                          ),
-                                                          buildAsync: false,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () =>
-                                                        Navigator.pop(context),
-                                                    style: TextButton.styleFrom(
-                                                      foregroundColor:
-                                                          OVTheme.primaryRed,
-                                                    ),
-                                                    child: Text(
-                                                        AppLocalizations.of(
-                                                                context)!
-                                                            .close),
-                                                  ),
-                                                ],
-                                              ), */
-                                                ),
+                                                    ))),
                                             style: OutlinedButton.styleFrom(
                                               foregroundColor:
                                                   Color(0xFF6D0E2E),
@@ -396,13 +285,7 @@ class LeadsView extends StatelessWidget {
                                                 fontWeight: FontWeight.w500,
                                               ),
                                             ),
-                                          ) /* Text(
-                                             AppLocalizations.of(context)!.learnMore,
-                                              style: OVTheme.bodyBase.copyWith(
-                                                color: OVTheme.primaryRed,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ), */
+                                          )
                                         ],
                                       ),
                                     ),
