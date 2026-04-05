@@ -3,6 +3,7 @@
   "upcomingEvents": "Próximos eventos",
   "searchButton": "Pesquisar",
   "searchHint": "Localização...",
+  "changeLanguage":"Mudar idioma",
   "seatsLeft": "{seatsLeft} lugares restantes",
   "onlySeatsLeft": "Restam apenas {seatsLeft} lugares",
   "paxPrice": "{paxPrice} por pessoa",
@@ -44,5 +45,13 @@
   "bookingSummaryTitle":"Reserva efetuada",
   "maxSeatsPerBooking": "Máximo de {maxSeatsPerBooking} lugares por reserva",
   "bookingSummarySeats": "{bookingSummarySeats} lugares reservados",
-  "emailBookingConfirmationWarning": "Enviámos um email de confirmação para {email}. Os seus lugares só serão confirmados depois de verificar o email."
+  "emailBookingConfirmationWarning": "Enviámos um email de confirmação para {email}. Os seus lugares só serão confirmados depois de verificar o email.",
+  "confirmYourEmail": "Confirme o seu email",
+  "confirmationCodeSentTo":"Enviámos um código de confirmação para {email}",
+  "bookingCodeConfirmationWarning": "A sua reserva foi registada, mas só será confirmada após a verificação do código enviado para o seu email.",
+  "checkSpamFolder": "Verifique a sua caixa de spam ou promoções caso não encontre o email.",
+  "confirmationCode":"Código de confirmação",
+  "enterDigitsCode":"Introduza o código de 4 dígitos",
+  "confirmButton": "Confirmar reserva",
+  "invalidCode": "Código inválido"
 }

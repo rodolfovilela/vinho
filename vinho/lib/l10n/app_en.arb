@@ -3,6 +3,7 @@
   "upcomingEvents": "Upcoming events",
   "searchButton": "Search",
   "searchHint": "Location...",
+  "changeLanguage":"Change language",
   "seatsLeft": "{seatsLeft} seats left",
   "onlySeatsLeft": "Only {seatsLeft} seats left",
   "paxPrice": "{paxPrice} per person",
@@ -44,6 +45,14 @@
   "bookingSummaryTitle":"Booking submitted",
   "maxSeatsPerBooking": "Maximum of {maxSeatsPerBooking} seats per booking",
   "bookingSummarySeats": "{bookingSummarySeats} seats reserved",
-  "emailBookingConfirmationWarning": "A confirmation email was sent to {email}. Your seat(s) will only be confirmed after you verify your email."
+  "emailBookingConfirmationWarning": "A confirmation email was sent to {email}. Your seat(s) will only be confirmed after you verify your email.",
+  "confirmYourEmail": "Verify your email",
+  "confirmationCodeSentTo":"We sent a confirmation code to {email}",
+  "bookingCodeConfirmationWarning": "Your booking has been submitted and will only be confirmed after you enter the verification code sent to your email.",
+  "checkSpamFolder": "Check your spam or promotions folder.",
+  "confirmationCode":"Confirmation code",
+  "enterDigitsCode":"Enter the 4-digit code",
+  "confirmButton": "Confirm booking",
+  "invalidCode": "Invalid code"
 }
 

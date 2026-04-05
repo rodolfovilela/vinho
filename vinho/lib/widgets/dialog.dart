@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:vinho/theme/ov_theme.dart';
 
 class OVDialog extends StatelessWidget {
-  OVDialog({super.key, required this.content});
+  OVDialog( {required this.isFullscreen,super.key, required this.content});
   final Widget content;
   final ScrollController _scrollController = ScrollController();
+  bool isFullscreen = false;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,8 @@ class OVDialog extends StatelessWidget {
         ),
         content: SizedBox(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 0.8,
+            height:
+                MediaQuery.of(context).size.height * (isFullscreen ? 1 : 0.8),
             child: Column(
               children: [
                 Expanded(

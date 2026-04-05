@@ -8,6 +8,7 @@ class BookingModel {
   final String name;
   final String email;
   final String phone;
+  String? verificationCode;
   final DateTime? createdAt;
 
   BookingModel({
@@ -17,6 +18,7 @@ class BookingModel {
     required this.name,
     required this.email,
     required this.phone,
+    this.verificationCode = '',
     this.createdAt,
   });
 
@@ -34,6 +36,7 @@ class BookingModel {
       name: json['name'] as String,
       email: json['email'] as String,
       phone: json['phone'] as String,
+      verificationCode: json['verificationCode'] as String? ?? '',
       createdAt: json['createdAt']?.toDate(),
     );
   }
@@ -45,6 +48,8 @@ class BookingModel {
       'name': name,
       'email': email,
       'phone': phone,
+      'verificationCode': verificationCode,
+      'createdAt': createdAt,
     };
   }
 }

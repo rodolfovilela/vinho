@@ -1,14 +1,11 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/model/booking_model.dart';
 import 'package:vinho/model/booking_summary_model.dart';
 import 'package:vinho/model/event_model.dart';
-import 'package:vinho/services/functions_service.dart';
 import 'package:vinho/services/toast_service.dart';
 import 'package:vinho/theme/ov_theme.dart';
-import 'package:vinho/view/booking_summary_view.dart';
+import 'package:vinho/view/booking_confirmation_view.dart';
 import 'package:vinho/view/privacy_policy_view.dart';
 import 'package:vinho/widgets/dialog.dart';
 
@@ -40,9 +37,7 @@ class _BookingViewState extends State<BookingView> {
   }
 
   Future<void> _submitBooking() async {
-    print('🔥 _submitBooking called');
     if (!_privacyConsent) {
-      print('❌ Privacy consent missing');
       if (mounted) {
         ToastService.error(
           context,
@@ -51,12 +46,9 @@ class _BookingViewState extends State<BookingView> {
       }
       return;
     }
-    print('✅ Privacy OK');
     if (_formKey.currentState!.validate()) {
-      print('✅ Form validated');
       setState(() => _isSubmitting = true);
       try {
-        print('📋 Creating booking, event.id: ${widget.event.id}');
         final fullPhone = _countryCodeController.text + _phoneController.text;
         final booking = BookingModel(
           eventId: widget.event.id!,
@@ -66,33 +58,18 @@ class _BookingViewState extends State<BookingView> {
           phone: fullPhone,
         );
 
-        print('🚀 Calling FunctionsService.bookSeats...');
-
-        bool ret = await FunctionsService.bookSeats(widget.event.id!, booking);
-        print('✅ bookSeats returned: $ret');
-
-        if (mounted) {
-          if (ret) {
-            context.go('/',
-                extra: BookingSummaryModel(
-                  booking: booking,
-                  event: widget.event,
-                  isSuccessful: true,
-                ));
-          } else {
-            ToastService.error(
-              context,
-              AppLocalizations.of(context)!.bookingError,
-            );
-          }
-        }
-      } catch (e) {
-        if (kDebugMode) print('Booking submit error: $e');
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error saving booking. Try again.')),
-          );
-        }
+        showDialog(
+          context: context,
+          barrierColor: OVTheme.semiTransparent,
+          builder: (context) => OVDialog(
+            isFullscreen: true,
+            content: BookingConfirmationView(
+                bookingSummaryModel: BookingSummaryModel(
+              event: widget.event,
+              booking: booking,
+            )),
+          ),
+        );
       } finally {
         if (mounted) setState(() => _isSubmitting = false);
       }
@@ -135,7 +112,7 @@ class _BookingViewState extends State<BookingView> {
                   children: [
                     Text(
                       AppLocalizations.of(context)!
-                          .onlySeatsLeft(widget.event.availableSeats ?? 0),
+                          .onlySeatsLeft(widget.event.availableSeats),
                       style: OVTheme.bodyBase.copyWith(
                         color: OVTheme.muted,
                         fontSize: 11,
@@ -174,24 +151,6 @@ class _BookingViewState extends State<BookingView> {
                     ),
                   ],
                 ),
-                /* ElevatedButton(
-                  onPressed: _showBookingConfirmation,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: OVTheme.primaryRed,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(1),
-                    ),
-                    elevation: 4,
-                  ),
-                  //icon: Icon(Icons.event_seat, color: Colors.white),
-                  child: Text(
-                    AppLocalizations.of(context)!.bookYourSeats,
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w500),
-                  ),
-                ), */
               ),
             ),
           ],
@@ -267,8 +226,7 @@ class _BookingViewState extends State<BookingView> {
                         onPressed: () => setState(() => _paxCount++),
                         icon: Icon(Icons.add, color: OVTheme.primaryRed),
                       ),
-                    if (!hasMoreButton())
-                      SizedBox(width: 40),
+                    if (!hasMoreButton()) SizedBox(width: 40),
                   ],
                 ),
               ],

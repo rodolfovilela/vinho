@@ -4,6 +4,7 @@ import * as admin from 'firebase-admin';
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 //import { Resend } from 'resend';
 import { logger } from 'firebase-functions/logger';
+
 if (!admin.apps.length) {
   admin.initializeApp();
 }
@@ -13,87 +14,92 @@ if (!admin.apps.length) {
 export const bookSeats = onCall(
   { region: "europe-west1" },
   async (request) => {
-
-    logger.info("Booking request received", {
-      userId: request.auth?.uid || "unauthenticated",
-      eventId: request.data?.eventId || "missing",
-      seats: request.data?.seats || "missing"
-    });
-    if (!request.auth) {
-      logger.warn("Unauthenticated booking attempt");
-      throw new HttpsError("unauthenticated", "Login required");
-    }
-
-    const { eventId, seats, name, email, phone } = request.data;
-
-    if (!eventId || !seats || !email || !name) {
-      logger.warn("Invalid booking data", { eventId, seats, name, email });
-      throw new HttpsError("invalid-argument", "Missing data");
-    }
-
-
-
-    const db = admin.firestore();
-    const eventRef = db.collection("events").doc(eventId);
-    const bookingRef = eventRef
-      .collection("bookings")
-      .doc(request.auth!.uid);
-
-    await db.runTransaction(async (tx) => {
-
-      const eventDoc = await tx.get(eventRef);
-
-      if (!eventDoc.exists) {
-        logger.warn("Event not found", { eventId });
-        throw new HttpsError("not-found", "Event not found");
-      }
-
-      const event = eventDoc.data();
-      const availableSeats = Number(event!.totalSeats ?? 0) - Number(event!.bookedSeats ?? 0);
-      const bookedSeats = Number(event!.bookedSeats ?? 0);
-      const requestedSeats = Number(seats);
-
-      const existingBooking = await tx.get(bookingRef);
-      if (existingBooking.exists) {
-        logger.warn("Booking already exists", { userId: request.auth!.uid, eventId });
-        throw new HttpsError("already-exists", "Already booked");
-      }
-      logger.info("Processing booking", {
-        userId: request.auth!.uid,
-        eventId,
-        requestedSeats,
-        availableSeats,
-        bookedSeats
+    try {
+      logger.info("Booking request received", {
+        userId: request.auth?.uid || "unauthenticated",
+        eventId: request.data?.eventId || "missing",
+        seats: request.data?.seats || "missing"
       });
-      if (requestedSeats > availableSeats) {
-        // Log overbooking attempt
-        await eventRef.collection('overbookings').add({
+      if (!request.auth) {
+        logger.warn("Unauthenticated booking attempt");
+        throw new OvaException("unauthenticated", "Login required");
+      }
+
+      const { eventId, seats, name, email, phone } = request.data;
+
+      if (!eventId || !seats || !email || !name) {
+        logger.warn("Invalid booking data", { eventId, seats, name, email });
+        throw new OvaException("invalid-argument", "Missing data");
+      }
+
+      const db = admin.firestore();
+      const eventRef = db.collection("events").doc(eventId);
+      const bookingRef = eventRef
+        .collection("bookings")
+        .doc(request.auth!.uid);
+
+      await db.runTransaction(async (tx) => {
+        const eventDoc = await tx.get(eventRef);
+
+        if (!eventDoc.exists) {
+          logger.warn("Event not found", { eventId });
+          throw new OvaException("event-not-found", "Event not found");
+        }
+
+        const event = eventDoc.data();
+        const availableSeats = Number(event!.totalSeats ?? 0) - Number(event!.bookedSeats ?? 0);
+        const bookedSeats = Number(event!.bookedSeats ?? 0);
+        const requestedSeats = Number(seats);
+
+        const existingBooking = await tx.get(bookingRef);
+        if (existingBooking.exists) {
+          logger.warn("Booking already exists", { userId: request.auth!.uid, eventId });
+          throw new OvaException("booking-already-exists", "Already booked");
+        }
+        logger.info("Processing booking", {
+          userId: request.auth!.uid,
+          eventId,
+          requestedSeats,
+          availableSeats,
+          bookedSeats
+        });
+        if (requestedSeats > availableSeats) {
+          // Log overbooking attempt
+          await eventRef.collection('overbookings').add({
+            userId: request.auth!.uid,
+            name: name.trim(),
+            email: email.trim().toLowerCase(),
+            phone: phone ? phone.trim() : null,
+            requestedSeats: requestedSeats,
+            timestamp: admin.firestore.FieldValue.serverTimestamp()
+          });
+
+          throw new OvaException("not-enough-seats", "Not enough seats");
+        }
+
+        tx.set(bookingRef, {
           userId: request.auth!.uid,
           name: name.trim(),
-          email: email.trim().toLowerCase(),
           phone: phone ? phone.trim() : null,
+          email: email.trim().toLowerCase(),
           requestedSeats: requestedSeats,
-          timestamp: admin.firestore.FieldValue.serverTimestamp()
+          createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
-        throw new HttpsError("failed-precondition", "Not enough seats");
+        tx.update(eventRef, {
+          bookedSeats: bookedSeats + requestedSeats
+        });
+      });
+
+      return { success: true, messageKey: "booking-submitted" };
+    } catch (error) {
+      logger.error("Error processing booking", { error: error instanceof Error ? error.message : error });
+      if (error instanceof OvaException) {
+        return { success: false, messageKey: error.code };
+      } else {
+        return { success: false, messageKey: "unknown-error" };
       }
-
-      tx.set(bookingRef, {
-        userId: request.auth!.uid,
-        name: name.trim(),
-        phone: phone ? phone.trim() : null,
-        email: email.trim().toLowerCase(),
-        requestedSeats: requestedSeats,
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
-      });
-
-      tx.update(eventRef, {
-        bookedSeats: bookedSeats + requestedSeats
-      });
-    });
-
-    return { success: true };
+    }
   }
 );
 
@@ -158,3 +164,10 @@ export const onBookingCreated = onDocumentCreated('events/{eventId}/bookings/{bo
 });
 */
 
+
+class OvaException extends HttpsError {
+  constructor(code: string, message: string) {
+    super(code as any, message);
+    this.name = 'OvaException';
+  }
+}

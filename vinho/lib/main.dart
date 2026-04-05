@@ -7,9 +7,10 @@ import 'package:vinho/l10n_helper/l10n_helper.dart';
 import 'package:vinho/model/booking_model.dart';
 import 'package:vinho/model/booking_summary_model.dart';
 import 'package:vinho/model/event_model.dart';
+import 'package:vinho/model/function_response_model.dart';
 import 'package:vinho/services/auth_service.dart';
 import 'package:vinho/theme/ov_theme.dart';
-import 'package:vinho/view/booking_summary_view.dart';
+import 'package:vinho/view/booking_callback_view.dart';
 import 'package:vinho/view/booking_view.dart';
 import 'package:vinho/view/event_detail_view.dart';
 import 'package:vinho/view/events_view.dart';
@@ -17,6 +18,7 @@ import 'package:vinho/view/leads_view.dart';
 import 'package:vinho/view/login_view.dart';
 import 'package:vinho/view/privacy_policy_view.dart';
 import 'package:vinho/widgets/dialog.dart';
+import 'package:vinho/widgets/footer.dart';
 import 'package:vinho/widgets/logo.dart';
 
 import 'firebase_options.dart';
@@ -120,18 +122,19 @@ class _HomeScreenState extends State<HomeScreen> {
             deadlineForMinimumPax: DateTime.now(),
             minimumPaxRequired: 10,
             location: 'Event Location'),
-        isSuccessful: true,
-        extraMessage: 'Extra message');
-        
+        response: FunctionResponseModel(
+            success: true, messageKey: 'booking-submitted'));
+
     _scrollController = ScrollController();
-    if (/* widget. */bookingSummary != null) {
+    if (/* widget. */ bookingSummary != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           showDialog(
             context: context,
             barrierColor: OVTheme.semiTransparent,
             builder: (context) => OVDialog(
-              content: BookingSummaryView(/* widget. */bookingSummary!),
+              isFullscreen: false,
+              content: BookingCallbackView(/* widget. */ bookingSummary!),
             ),
           );
         }
@@ -180,11 +183,15 @@ class _HomeScreenState extends State<HomeScreen> {
           thickness: 3,
           child: SingleChildScrollView(
             controller: _scrollController,
-            child: Padding(
+            child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              height: MediaQuery.of(context).size.height -
+                  kToolbarHeight -
+                  MediaQuery.of(context).padding.top,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   /* QuickSearchView(), 
                   SizedBox(height: 16), */

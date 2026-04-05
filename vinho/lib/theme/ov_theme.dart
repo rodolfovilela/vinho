@@ -144,6 +144,7 @@ class OVTheme {
       GoogleFonts.lato(color: OVTheme.vaporwaveGray, letterSpacing: 0.25);
   static TextStyle titlesBase =
       GoogleFonts.playfairDisplay(color: OVTheme.vaporwaveGray);
+      
 
   static InputDecorationTheme inputDecorationTheme = InputDecorationTheme(
     focusedBorder: OutlineInputBorder(

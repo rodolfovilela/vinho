@@ -7,6 +7,7 @@ import 'package:vinho/model/lead_model.dart';
 import 'package:vinho/services/firestore_service.dart';
 import 'package:vinho/theme/ov_theme.dart';
 import 'package:vinho/widgets/dialog.dart';
+import 'package:vinho/widgets/footer.dart';
 
 class LeadsView extends StatelessWidget {
   LeadsView({super.key});
@@ -24,12 +25,6 @@ class LeadsView extends StatelessWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
-        /* title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AppLogo(),
-          ],
-        ), */
       ),
       body: SafeArea(
         child: RawScrollbar(
@@ -41,7 +36,7 @@ class LeadsView extends StatelessWidget {
           thickness: 3,
           child: SingleChildScrollView(
             controller: _scrollControllerA,
-            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
             child: Column(
               children: [
                 Padding(
@@ -183,6 +178,7 @@ class LeadsView extends StatelessWidget {
                                                     OVTheme.semiTransparent,
                                                 context: context,
                                                 builder: (context) => OVDialog(
+                                                      isFullscreen: false,
                                                         content: Column(
                                                       children: [
                                                         Text(
@@ -298,6 +294,7 @@ class LeadsView extends StatelessWidget {
                     }
                   },
                 ),
+                const Footer(),
               ],
             ),
           ),
