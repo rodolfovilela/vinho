@@ -54,7 +54,7 @@ class _EventsViewState extends State<EventsView> {
       trackVisibility: true,
       //  radius: Radius.circular(8),
       thumbColor: OVTheme.primaryRed,
-      thickness: 4,
+      thickness: 3,
       child: SingleChildScrollView(
         controller: _scrollController,
         child: Column(
@@ -202,7 +202,7 @@ class _EventsViewState extends State<EventsView> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                Icons.calendar_month_outlined,
+                                Icons.calendar_today,
                                 color: OVTheme.primaryRed,
                                 size: 16,
                               ),

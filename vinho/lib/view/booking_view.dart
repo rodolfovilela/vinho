@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/model/booking_model.dart';
+import 'package:vinho/model/booking_summary_model.dart';
 import 'package:vinho/model/event_model.dart';
 import 'package:vinho/services/functions_service.dart';
 import 'package:vinho/services/toast_service.dart';
@@ -72,12 +73,12 @@ class _BookingViewState extends State<BookingView> {
 
         if (mounted) {
           if (ret) {
-            context.go('/');
-            showDialog(
-                barrierColor: OVTheme.semiTransparent,
-                context: context,
-                builder: (context) => OVDialog(
-                    content: BookingSummaryView(widget.event, booking)));
+            context.go('/',
+                extra: BookingSummaryModel(
+                  booking: booking,
+                  event: widget.event,
+                  isSuccessful: true,
+                ));
           } else {
             ToastService.error(
               context,
@@ -114,7 +115,7 @@ class _BookingViewState extends State<BookingView> {
               thumbVisibility: true,
               trackVisibility: true,
               thumbColor: OVTheme.primaryRed,
-              thickness: 4,
+              thickness: 3,
               child: SingleChildScrollView(
                 controller: _scrollController,
                 child: Container(
@@ -213,21 +214,37 @@ class _BookingViewState extends State<BookingView> {
                 Row(
                   //  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right:8.0),
-                      child: Text(
-                        AppLocalizations.of(context)!.numberOfGuests,
-                        style: OVTheme.bodyBase.copyWith(
-                          color: OVTheme.blackRetro,
-                          fontSize: 14,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 60.0),
+                          child: Text(
+                            AppLocalizations.of(context)!.numberOfGuests,
+                            style: OVTheme.bodyBase.copyWith(
+                              color: OVTheme.blackRetro,
+                              fontSize: 14,
+                            ),
+                          ),
                         ),
-                      ),
+                        if (widget.event.hasMaxSeatsPerBooking &&
+                            widget.event.maxSeatsPerBooking != null)
+                          Text(
+                            AppLocalizations.of(context)!.maxSeatsPerBooking(
+                                widget.event.maxSeatsPerBooking!),
+                            style: OVTheme.bodyBase.copyWith(
+                              color: OVTheme.muted,
+                              fontSize: 11,
+                            ),
+                          ),
+                      ],
                     ),
                     if (_paxCount > 1)
                       IconButton(
                         onPressed: () => setState(() => _paxCount--),
                         icon: Icon(Icons.remove, color: OVTheme.muted),
                       ),
+                    if (_paxCount == 1) SizedBox(width: 40),
                     Container(
                       width: 60,
                       alignment: Alignment.center,
@@ -245,25 +262,15 @@ class _BookingViewState extends State<BookingView> {
                         ),
                       ),
                     ),
-                    if (_paxCount < widget.event.availableSeats &&
-                        (!widget.event.hasMaxSeatsPerBooking ||
-                            _paxCount < (widget.event.maxSeatsPerBooking ?? 0)))
+                    if (hasMoreButton())
                       IconButton(
                         onPressed: () => setState(() => _paxCount++),
                         icon: Icon(Icons.add, color: OVTheme.primaryRed),
                       ),
+                    if (!hasMoreButton())
+                      SizedBox(width: 40),
                   ],
                 ),
-                if (widget.event.hasMaxSeatsPerBooking &&
-                    widget.event.maxSeatsPerBooking != null)
-                  Text(
-                    AppLocalizations.of(context)!
-                        .maxSeatsPerBooking(widget.event.maxSeatsPerBooking!),
-                    style: OVTheme.bodyBase.copyWith(
-                      color: OVTheme.muted,
-                      fontSize: 11,
-                    ),
-                  ),
               ],
             ),
           ),
@@ -404,6 +411,12 @@ class _BookingViewState extends State<BookingView> {
         ],
       ),
     );
+  }
+
+  bool hasMoreButton() {
+    return _paxCount < widget.event.availableSeats &&
+        (!widget.event.hasMaxSeatsPerBooking ||
+            _paxCount < (widget.event.maxSeatsPerBooking ?? 0));
   }
 
   Widget buildHeader(BuildContext context) {

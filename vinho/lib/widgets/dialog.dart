@@ -41,7 +41,7 @@ class OVDialog extends StatelessWidget {
                     trackVisibility: true,
                     //  radius: Radius.circular(8),
                     thumbColor: OVTheme.primaryRed,
-                    thickness: 4,
+                    thickness: 3,
                     child: SingleChildScrollView(
                       controller: _scrollController,
                       child: content,

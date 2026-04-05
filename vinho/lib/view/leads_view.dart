@@ -38,7 +38,7 @@ class LeadsView extends StatelessWidget {
           trackVisibility: true,
           //  radius: Radius.circular(8),
           thumbColor: OVTheme.primaryRed,
-          thickness: 4,
+          thickness: 3,
           child: SingleChildScrollView(
             controller: _scrollControllerA,
             padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
@@ -219,7 +219,7 @@ class LeadsView extends StatelessWidget {
                                                             //  radius: Radius.circular(8),
                                                             thumbColor: OVTheme
                                                                 .primaryRed,
-                                                            thickness: 4,
+                                                            thickness: 3,
                                                             //   minThumbLength: 50,
                                                             child:
                                                                 SingleChildScrollView(

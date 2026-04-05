@@ -1,20 +1,22 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/l10n_helper/l10n_helper.dart';
+import 'package:vinho/model/booking_model.dart';
+import 'package:vinho/model/booking_summary_model.dart';
 import 'package:vinho/model/event_model.dart';
 import 'package:vinho/services/auth_service.dart';
-import 'package:vinho/services/functions_service.dart';
 import 'package:vinho/theme/ov_theme.dart';
+import 'package:vinho/view/booking_summary_view.dart';
 import 'package:vinho/view/booking_view.dart';
 import 'package:vinho/view/event_detail_view.dart';
 import 'package:vinho/view/events_view.dart';
 import 'package:vinho/view/leads_view.dart';
 import 'package:vinho/view/login_view.dart';
 import 'package:vinho/view/privacy_policy_view.dart';
+import 'package:vinho/widgets/dialog.dart';
 import 'package:vinho/widgets/logo.dart';
 
 import 'firebase_options.dart';
@@ -40,7 +42,10 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return  HomeScreen();
+        return HomeScreen(
+            bookingSummary: state.extra is BookingSummaryModel
+                ? state.extra as BookingSummaryModel
+                : null);
       },
       routes: <RouteBase>[
         GoRoute(
@@ -60,7 +65,7 @@ final GoRouter _router = GoRouter(
           builder: (BuildContext context, GoRouterState state) {
             return state.extra != null && state.extra is EventModel
                 ? EventDetailView(state.extra as EventModel)
-                :  HomeScreen();
+                : HomeScreen();
           },
         ),
         GoRoute(
@@ -68,7 +73,7 @@ final GoRouter _router = GoRouter(
           builder: (BuildContext context, GoRouterState state) {
             return state.extra != null && state.extra is EventModel
                 ? BookingView(state.extra as EventModel)
-                :  HomeScreen();
+                : HomeScreen();
           },
         ),
         GoRoute(
@@ -76,7 +81,7 @@ final GoRouter _router = GoRouter(
           builder: (BuildContext context, GoRouterState state) {
             return state.extra != null && state.extra is EventModel
                 ? PrivacyPolicyView()
-                :  HomeScreen();
+                : HomeScreen();
           },
         ),
       ],
@@ -84,10 +89,61 @@ final GoRouter _router = GoRouter(
   ],
 );
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key, this.bookingSummary});
 
-  final ScrollController _scrollController = ScrollController();
+  final BookingSummaryModel? bookingSummary;
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    BookingSummaryModel bookingSummary = BookingSummaryModel(
+        booking: BookingModel(
+            eventId: 'eventId',
+            seats: 2,
+            name: 'name',
+            email: ' email',
+            phone: ' phone'),
+        event: EventModel(
+            id: 'eventId',
+            title: 'Event Title',
+            date: '2024-12-31',
+            time: '20:00',
+            address: 'Event Address',
+            deadlineForMinimumPax: DateTime.now(),
+            minimumPaxRequired: 10,
+            location: 'Event Location'),
+        isSuccessful: true,
+        extraMessage: 'Extra message');
+        
+    _scrollController = ScrollController();
+    if (/* widget. */bookingSummary != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          showDialog(
+            context: context,
+            barrierColor: OVTheme.semiTransparent,
+            builder: (context) => OVDialog(
+              content: BookingSummaryView(/* widget. */bookingSummary!),
+            ),
+          );
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,8 +155,7 @@ class HomeScreen extends StatelessWidget {
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
         title: SizedBox(
-          width: MediaQuery.of(context).size.width -
-              100, // Adjust width to center the logo
+          width: MediaQuery.of(context).size.width - 100,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [const AppLogo()],
@@ -121,9 +176,8 @@ class HomeScreen extends StatelessWidget {
           controller: _scrollController,
           thumbVisibility: true,
           trackVisibility: true,
-          //  radius: Radius.circular(8),
           thumbColor: OVTheme.primaryRed,
-          thickness: 4,
+          thickness: 3,
           child: SingleChildScrollView(
             controller: _scrollController,
             child: Padding(
