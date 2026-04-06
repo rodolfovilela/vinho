@@ -14,7 +14,7 @@ if (!admin.apps.length) {
 export const bookSeats = onCall(
   { region: "europe-west1" },
   async (request) => {
-    try {
+  /*   try { */
       logger.info("Booking request received", {
         userId: request.auth?.uid || "unauthenticated",
         eventId: request.data?.eventId || "missing",
@@ -22,14 +22,14 @@ export const bookSeats = onCall(
       });
       if (!request.auth) {
         logger.warn("Unauthenticated booking attempt");
-        throw new OvaException("unauthenticated", "Login required");
+        throw new HttpsError("unauthenticated", "Login required");
       }
 
       const { eventId, seats, name, email, phone } = request.data;
 
       if (!eventId || !seats || !email || !name) {
         logger.warn("Invalid booking data", { eventId, seats, name, email });
-        throw new OvaException("invalid-argument", "Missing data");
+        throw new HttpsError("invalid-argument", "Missing data");
       }
 
       const db = admin.firestore();
@@ -43,7 +43,7 @@ export const bookSeats = onCall(
 
         if (!eventDoc.exists) {
           logger.warn("Event not found", { eventId });
-          throw new OvaException("event-not-found", "Event not found");
+          throw new HttpsError("not-found", "event-not-found");
         }
 
         const event = eventDoc.data();
@@ -51,11 +51,11 @@ export const bookSeats = onCall(
         const bookedSeats = Number(event!.bookedSeats ?? 0);
         const requestedSeats = Number(seats);
 
-        const existingBooking = await tx.get(bookingRef);
+        /* const existingBooking = await tx.get(bookingRef);
         if (existingBooking.exists) {
           logger.warn("Booking already exists", { userId: request.auth!.uid, eventId });
-          throw new OvaException("booking-already-exists", "Already booked");
-        }
+          throw new HttpsError("already-exists", "booking-already-exists");
+        } */
         logger.info("Processing booking", {
           userId: request.auth!.uid,
           eventId,
@@ -74,7 +74,7 @@ export const bookSeats = onCall(
             timestamp: admin.firestore.FieldValue.serverTimestamp()
           });
 
-          throw new OvaException("not-enough-seats", "Not enough seats");
+          throw new HttpsError("failed-precondition", "not-enough-seats");
         }
 
         tx.set(bookingRef, {
@@ -92,14 +92,33 @@ export const bookSeats = onCall(
       });
 
       return { success: true, messageKey: "booking-submitted" };
-    } catch (error) {
-      logger.error("Error processing booking", { error: error instanceof Error ? error.message : error });
-      if (error instanceof OvaException) {
-        return { success: false, messageKey: error.code };
-      } else {
-        return { success: false, messageKey: "unknown-error" };
-      }
-    }
+    /* } catch (error) {
+      const errorName = (error as any).name;
+      const isOvaInstanceof = error instanceof OvaException;
+      const errorProto = Object.getPrototypeOf(error);
+      const ovaProtoMatch = errorProto === OvaException.prototype;
+      
+      const isOva = errorName === 'OvaException' && typeof (error as any).code === 'string';
+      
+      if (isOva) {
+        return { success: false, messageKey: (error as any).code };
+      } 
+      
+      // Log only non-Ova errors to avoid circular logger error
+      logger.error("Unexpected error processing booking", {
+        isOvaInstanceof,
+        errorName,
+        ovaProtoMatch,
+        errorProtoName: errorProto?.constructor?.name,
+        code: (error as any).code,
+        message: error instanceof Error ? error.message : String(error),
+        err: error
+      });
+      
+      return { success: false, messageKey: "unknown-error" };
+    } */
+
+
   }
 );
 
@@ -163,11 +182,13 @@ export const onBookingCreated = onDocumentCreated('events/{eventId}/bookings/{bo
   // Handle new booking
 });
 */
-
+/* 
 
 class OvaException extends HttpsError {
   constructor(code: string, message: string) {
     super(code as any, message);
     this.name = 'OvaException';
+    Object.setPrototypeOf(this, OvaException.prototype);
   }
 }
+ */

@@ -5,6 +5,7 @@ import 'package:vinho/model/event_model.dart';
 import 'package:vinho/services/firestore_service.dart';
 import 'package:vinho/theme/ov_theme.dart';
 import 'package:vinho/util/layout.dart';
+import 'package:vinho/view/event_detail_view.dart';
 
 class EventsView extends StatefulWidget {
   const EventsView({super.key});
@@ -302,15 +303,20 @@ class _EventsViewState extends State<EventsView> {
                               size: 16,
                             ),
                             SizedBox(width: 4),
-                            Flexible(
-                              child: Text(
-                                AppLocalizations.of(context)!
-                                    .seatsLeft(event.availableSeats.toString()),
-                                style: OVTheme.bodyBase
-                                    .copyWith(color: OVTheme.muted),
-                                overflow: TextOverflow.ellipsis,
+                            if (event.isFullyBooked)
+                              Flexible(
+                                child: SoldOutWidget(context: context),
                               ),
-                            ),
+                            if (!event.isFullyBooked)
+                              Flexible(
+                                child: Text(
+                                  AppLocalizations.of(context)!.seatsLeft(
+                                      event.availableSeats.toString()),
+                                  style: OVTheme.bodyBase
+                                      .copyWith(color: OVTheme.muted),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
                           ],
                         ),
                       ),

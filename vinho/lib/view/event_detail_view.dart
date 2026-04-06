@@ -57,33 +57,35 @@ class _EventDetailViewState extends State<EventDetailView> {
                 child: buildEventCard(widget.event),
               ),
             ),
-            Positioned(
-              bottom: 4,
-              left: 16,
-              right: 16,
-              child: SafeArea(
-                child: ElevatedButton(
-                  onPressed: () =>
-                      context.push('/booking', extra: widget.event),
+            if (!widget.event.isFullyBooked)
+              Positioned(
+                bottom: 4,
+                left: 16,
+                right: 16,
+                child: SafeArea(
+                  child: ElevatedButton(
+                    onPressed: () =>
+                        context.push('/booking', extra: widget.event),
 
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: OVTheme.primaryRed,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(1),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: OVTheme.primaryRed,
+                      foregroundColor: Colors.white,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(1),
+                      ),
+                      elevation: 4,
                     ),
-                    elevation: 4,
-                  ),
-                  //icon: Icon(Icons.event_seat, color: Colors.white),
-                  child: Text(
-                    AppLocalizations.of(context)!.bookYourSeats,
-                    style: OVTheme.bodyBase.copyWith(
-                        color: Colors.white, fontWeight: FontWeight.w500),
+                    //icon: Icon(Icons.event_seat, color: Colors.white),
+                    child: Text(
+                      AppLocalizations.of(context)!.bookYourSeats,
+                      style: OVTheme.bodyBase.copyWith(
+                          color: Colors.white, fontWeight: FontWeight.w500),
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -249,8 +251,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                                           fontWeight: FontWeight.w600),
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                  if (event.availableSeats != null &&
-                                      event.totalSeats != null)
+                                  if (event.totalSeats != null)
                                     Expanded(
                                       child: Row(
                                         children: [
@@ -260,19 +261,24 @@ class _EventDetailViewState extends State<EventDetailView> {
                                             size: 18,
                                           ),
                                           SizedBox(width: 4),
-                                          Flexible(
-                                            child: Text(
-                                              AppLocalizations.of(context)!
-                                                  .seatsRemaining(
-                                                      event.availableSeats
-                                                          .toString(),
-                                                      event.totalSeats ?? 0),
-                                              style: OVTheme.bodyBase.copyWith(
-                                                  //        fontSize: 13,
-                                                  fontWeight: FontWeight.w600),
-                                              overflow: TextOverflow.ellipsis,
+                                          if (event.isFullyBooked)
+                                            SoldOutWidget(context: context)
+                                          else
+                                            Flexible(
+                                              child: Text(
+                                                AppLocalizations.of(context)!
+                                                    .seatsRemaining(
+                                                        event.availableSeats
+                                                            .toString(),
+                                                        event.totalSeats ?? 0),
+                                                style: OVTheme.bodyBase
+                                                    .copyWith(
+                                                        //        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.w600),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
                                             ),
-                                          ),
                                           /*  Flexible(
                                     child: Text(
                                       AppLocalizations.of(context)!
@@ -384,8 +390,11 @@ class _EventDetailViewState extends State<EventDetailView> {
                   ],
                 ),
               ),
-              if (event.hasMinimumPaxRequired &&
-                  event.hasDeadlineForMinimumPax) ...[
+              if (!widget.event.isFullyBooked &&
+                  event.hasMinimumPaxRequired &&
+                  event.hasDeadlineForMinimumPax &&
+                  event.bookedSeats != null &&
+                  event.bookedSeats! < (event.minimumPaxRequired ?? 0)) ...[
                 Container(
                   decoration: BoxDecoration(
                     border: Border.all(
@@ -442,6 +451,36 @@ class _EventDetailViewState extends State<EventDetailView> {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ), */
+    );
+  }
+}
+
+class SoldOutWidget extends StatelessWidget {
+  const SoldOutWidget({
+    super.key,
+    required this.context,
+  });
+
+  final BuildContext context;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: OVTheme.muted,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        AppLocalizations.of(context)!.soldOut,
+        style: OVTheme.bodyBase.copyWith(
+          color: Colors.white,
+          letterSpacing: 1,
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+        ),
+        overflow: TextOverflow.ellipsis,
+      ),
     );
   }
 }

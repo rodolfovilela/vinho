@@ -30,7 +30,7 @@
   "phoneRequired": "Precisamos do seu número de telefone",
   "cancel":"Cancelar",
   "bookNow":"Reservar agora",
-  "bookingConfirmed": "Reserva confirmada!",
+  "bookingConfirmed": "Reserva confirmada",
   "withVar": "Com: {variable}",
   "slogan1": "O vinho é mais do que uma bebida: é partilha.",
   "ourMissionTitle": "Nossa missão",
@@ -53,5 +53,6 @@
   "confirmationCode":"Código de confirmação",
   "enterDigitsCode":"Introduza o código de 4 dígitos",
   "confirmButton": "Confirmar reserva",
-  "invalidCode": "Código inválido"
+  "invalidCode": "Código inválido",
+  "soldOut": "Evento esgotado"
 }

@@ -19,11 +19,12 @@ class FunctionsService {
 
       return FunctionResponseModel(
         success: result.data['success'] ?? false,
-        messageKey: result.data['messageKey'] ?? 'unknown-error',
+        messageKey: result.data['messageKey'] ?? '',
       );
-    } on FunctionResponseModel catch (e) {
-      print('Exception: $e.code, ${e.messageKey}');
-      return FunctionResponseModel(success: false, messageKey: e.messageKey);
+    } on FirebaseFunctionsException catch (e) {
+      print('Exception: $e.code, ${e.message}, ${e.details}');
+      return FunctionResponseModel(
+          success: false, messageKey: e.message ?? 'unknown-error', errorCode: e.code);
     }
   }
 }

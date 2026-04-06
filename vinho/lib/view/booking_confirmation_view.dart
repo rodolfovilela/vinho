@@ -28,17 +28,19 @@ class _BookingConfirmationViewState extends State<BookingConfirmationView> {
   }
 
   Future<void> _submitBooking() async {
-    if (_formKey.currentState!.validate()) {
+    //if (_formKey.currentState!.validate()) {
       setState(() => _isSubmitting = true);
       try {
-        widget.bookingSummaryModel.booking.verificationCode =
-            _verificationCodeController.text;
-        FunctionResponseModel ret = await FunctionsService.bookSeats(
-            widget.bookingSummaryModel.event.id ?? '',
+          widget.bookingSummaryModel.booking.verificationCode =
+          _verificationCodeController.text;
+            if (widget.bookingSummaryModel.event.id != null) {
+          FunctionResponseModel ret = await FunctionsService.bookSeats(
+            widget.bookingSummaryModel.event.id!,
             widget.bookingSummaryModel.booking);
+          widget.bookingSummaryModel.response = ret;
+        }
 
         if (mounted) {
-          widget.bookingSummaryModel.response = ret;
           context.go(
             '/',
             extra: widget.bookingSummaryModel,
@@ -47,7 +49,7 @@ class _BookingConfirmationViewState extends State<BookingConfirmationView> {
       } finally {
         if (mounted) setState(() => _isSubmitting = false);
       }
-    }
+  //  }
   }
 
   @override
@@ -84,11 +86,8 @@ class _BookingConfirmationViewState extends State<BookingConfirmationView> {
                 ),
                 Text(AppLocalizations.of(context)!
                     .bookingCodeConfirmationWarning),
-                Text(AppLocalizations.of(context)!.checkSpamFolder,
-                    style: OVTheme.bodyBase
-                        .copyWith(fontSize: 12, color: OVTheme.muted)),
                 Container(
-                  margin: const EdgeInsets.only(top: 16),
+                  margin: const EdgeInsets.only(top: 32, bottom: 8),
                   child: TextFormField(
                     controller: _verificationCodeController,
                     decoration: InputDecoration(
@@ -110,7 +109,7 @@ class _BookingConfirmationViewState extends State<BookingConfirmationView> {
                   ),
                 ),
                 Container(
-                  margin: const EdgeInsets.only(top: 8),
+                  margin: const EdgeInsets.symmetric(vertical: 16),
                   width: double.infinity,
                   child: ElevatedButton(
                       onPressed: _isSubmitting ? null : _submitBooking,
@@ -139,6 +138,9 @@ class _BookingConfirmationViewState extends State<BookingConfirmationView> {
                                   color: Colors.white,
                                   fontWeight: FontWeight.w500))),
                 ),
+                Text(AppLocalizations.of(context)!.checkSpamFolder,
+                    style: OVTheme.bodyBase
+                        .copyWith(fontSize: 12, color: OVTheme.muted)),
               ],
             ),
           )),

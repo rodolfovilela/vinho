@@ -123,7 +123,11 @@ class _BookingViewState extends State<BookingView> {
                       margin: const EdgeInsets.only(top: 8),
                       width: double.infinity,
                       child: ElevatedButton(
-                          onPressed: _isSubmitting ? null : _submitBooking,
+                          onPressed: _isSubmitting ||
+                                  (_formKey.currentState != null &&
+                                      !_formKey.currentState!.validate())
+                              ? null
+                              : _submitBooking,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: OVTheme.primaryRed,
                             foregroundColor: Colors.white,

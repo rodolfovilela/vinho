@@ -21,7 +21,7 @@ class _BookingCallbackViewState extends State<BookingCallbackView> {
         child: Column(
           children: [
             Text(
-              "${AppLocalizations.of(context)!.bookingSummaryTitle} - ${widget.bookingSummary.event.title}",
+              "${AppLocalizations.of(context)!.bookingConfirmed} - ${widget.bookingSummary.event.title}",
               style: OVTheme.titlesBase.copyWith(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -35,6 +35,22 @@ class _BookingCallbackViewState extends State<BookingCallbackView> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: Row(
+                        children: [
+                          Icon(Icons.chair_alt,
+                              color: OVTheme.primaryRed, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            AppLocalizations.of(context)!.bookingSummarySeats(
+                                widget.bookingSummary.booking.seats),
+                            style: OVTheme.bodyBase
+                                .copyWith(fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
+                    ),
                     if (widget.bookingSummary.event.date != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 16.0),
@@ -109,18 +125,17 @@ class _BookingCallbackViewState extends State<BookingCallbackView> {
                             ],
                           )),
                     SizedBox(height: 16),
-                    Text(
-                      AppLocalizations.of(context)!.bookingSummarySeats(
-                          widget.bookingSummary.booking.seats),
-                      style: OVTheme.bodyBase
-                          .copyWith(fontWeight: FontWeight.w500),
-                    ),
+                    /* 
                     Text(AppLocalizations.of(context)!
                         .emailBookingConfirmationWarning(
-                            widget.bookingSummary.booking.email)),
+                            widget.bookingSummary.booking.email)), */
                     SizedBox(height: 16),
                     if (widget.bookingSummary.event.hasMinimumPaxRequired &&
-                        widget.bookingSummary.event.hasDeadlineForMinimumPax)
+                        widget.bookingSummary.event.hasDeadlineForMinimumPax &&
+                        widget.bookingSummary.event.bookedSeats != null &&
+                        widget.bookingSummary.event.bookedSeats! <
+                            (widget.bookingSummary.event.minimumPaxRequired ??
+                                0))
                       Container(
                         decoration: BoxDecoration(
                           border: Border.all(
@@ -131,12 +146,11 @@ class _BookingCallbackViewState extends State<BookingCallbackView> {
                         child: Text(
                           AppLocalizations.of(context)!
                               .minimumPaxRequiredWithDeadlineDisclaimer(
-                                  widget.bookingSummary.event.minimumPaxRequired
-                                      .toString(),
-                                  DateFormat.yMMMd().add_jm().format(widget
-                                      .bookingSummary
-                                      .event
-                                      .deadlineForMinimumPax!)),
+                            DateFormat.yMMMd().add_jm().format(widget
+                                .bookingSummary.event.deadlineForMinimumPax!),
+                            widget.bookingSummary.event.minimumPaxRequired
+                                .toString(),
+                          ),
                           style: OVTheme.bodyBase.copyWith(
                             height: 1.6,
                             fontSize: 13,
@@ -156,7 +170,7 @@ class _BookingCallbackViewState extends State<BookingCallbackView> {
         ),
       );
     } else {
-      switch (widget.bookingSummary.response!.errorCode) {
+      switch (widget.bookingSummary.response!.messageKey) {
         case 'not-enough-seats':
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),

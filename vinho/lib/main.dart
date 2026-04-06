@@ -106,7 +106,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    BookingSummaryModel bookingSummary = BookingSummaryModel(
+    _scrollController = ScrollController();
+    /* BookingSummaryModel bookingSummary = BookingSummaryModel(
         booking: BookingModel(
             eventId: 'eventId',
             seats: 2,
@@ -125,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
         response: FunctionResponseModel(
             success: true, messageKey: 'booking-submitted'));
 
-    _scrollController = ScrollController();
+    
     if (/* widget. */ bookingSummary != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -139,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
       });
-    }
+    } */
   }
 
   @override
@@ -150,6 +151,39 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    /*  BookingSummaryModel bookingSummary = BookingSummaryModel(
+        booking: BookingModel(
+            eventId: 'eventId',
+            seats: 2,
+            name: 'name',
+            email: ' email',
+            phone: ' phone'),
+        event: EventModel(
+            id: 'eventId',
+            title: 'Event Title',
+            date: '2024-12-31',
+            time: '20:00',
+            address: 'Event Address',
+            deadlineForMinimumPax: DateTime.now(),
+            minimumPaxRequired: 10,
+            location: 'Event Location'),
+        response: FunctionResponseModel(
+            success: true, messageKey: 'booking-submitted')); */
+
+    if (widget.bookingSummary != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          showDialog(
+            context: context,
+            barrierColor: OVTheme.semiTransparent,
+            builder: (context) => OVDialog(
+              isFullscreen: false,
+              content: BookingCallbackView(widget.bookingSummary!),
+            ),
+          );
+        }
+      });
+    }
     return Scaffold(
       backgroundColor: OVTheme.backgroundColor,
       appBar: AppBar(

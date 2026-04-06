@@ -30,7 +30,7 @@
   "phoneRequired": "We need your phone number",
   "cancel":"Cancel",
   "bookNow":"Book Now",
-  "bookingConfirmed": "Booking confirmed!",
+  "bookingConfirmed": "Booking confirmed",
   "withVar": "With: {variable}",
   "slogan1": "Wine is more than a drink: it’s about sharing.",
   "ourMissionTitle": "Our mission",
@@ -53,6 +53,7 @@
   "confirmationCode":"Confirmation code",
   "enterDigitsCode":"Enter the 4-digit code",
   "confirmButton": "Confirm booking",
-  "invalidCode": "Invalid code"
+  "invalidCode": "Invalid code",
+  "soldOut": "Sold out"
 }
 
