@@ -1,4 +1,4 @@
-import 'package:vinho/model/event_model.dart';
+/* import 'package:vinho/model/event_model.dart';
 
 List<EventModel> get mockedEvents => List.from(<EventModel>[
       EventModel(
@@ -270,3 +270,4 @@ List<EventModel> get mockedEvents => List.from(<EventModel>[
           location: "Douro Superior, Norte",
           region: "Douro")
     ]);
+ */

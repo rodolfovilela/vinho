@@ -24,7 +24,53 @@ class FunctionsService {
     } on FirebaseFunctionsException catch (e) {
       print('Exception: $e.code, ${e.message}, ${e.details}');
       return FunctionResponseModel(
+          success: false,
+          messageKey: e.message ?? 'unknown-error',
+          errorCode: e.code);
+    }
+  }
+
+  /*  static Future<FunctionResponseModel> cancelBooking(
+      String eventId, String bookingId) async {
+    try {
+      await FirebaseAuth.instance.signInAnonymously();
+      final callable = functions.httpsCallable('cancelBooking');
+      final result = await callable.call({
+        'eventId': eventId,
+        'bookingId': bookingId,
+      });
+
+      return FunctionResponseModel(
+        success: result.data['success'] ?? false,
+        messageKey: result.data['messageKey'] ?? '',
+      );
+    } on FirebaseFunctionsException catch (e) {
+      print('Exception: $e.code, ${e.message}, ${e.details}');
+      return FunctionResponseModel(
           success: false, messageKey: e.message ?? 'unknown-error', errorCode: e.code);
+    }
+  }
+   */
+
+  static Future<FunctionResponseModel> searchEvents(String location) async {
+    try {
+      final callable = functions.httpsCallable('searchEvents');
+      final result = await callable.call({'location': location});
+
+      return FunctionResponseModel.fromMap(result
+              .data) /* (
+        success: result.data['success'] ?? false,
+        messageKey: result.data['messageKey'] ?? '',
+        entitieIds: List<String>.from(result.data['entities']?.map((e) => e['id']) ?? []),
+      ) */
+          ;
+    } on FirebaseFunctionsException catch (e) {
+      print('Exception: $e.code, ${e.message}, ${e.details}');
+      return FunctionResponseModel(
+          success: false,
+          messageKey: e.message ?? 'unknown-error',
+          errorCode: e.code,
+          entitieIds: []);
     }
   }
 }

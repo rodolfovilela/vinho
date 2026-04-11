@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/model/event_model.dart';
+import 'package:vinho/model/function_response_model.dart';
 import 'package:vinho/services/firestore_service.dart';
+import 'package:vinho/services/functions_service.dart';
+import 'package:vinho/services/location.dart';
 import 'package:vinho/theme/ov_theme.dart';
 import 'package:vinho/util/layout.dart';
 import 'package:vinho/view/event_detail_view.dart';
+import 'package:vinho/widgets/location_autocomplete.dart';
 
 class EventsView extends StatefulWidget {
   const EventsView({super.key});
@@ -16,13 +21,17 @@ class EventsView extends StatefulWidget {
 
 class _EventsViewState extends State<EventsView> {
   final ScrollController _scrollController = ScrollController();
-  List<EventModel>? _events;
+  List<EventModel>? _events, _searchResults, _filteredEvents;
   late final FirestoreService _firestoreService;
+  bool _isSearching = false;
+  TextEditingController locationController = TextEditingController();
+  final _formKey = GlobalKey<FormBuilderState>();
 
   @override
   void initState() {
     super.initState();
     _firestoreService = FirestoreService();
+    // controller = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _firestoreService
           .getEventsStream(Localizations.localeOf(context).languageCode)
@@ -31,6 +40,8 @@ class _EventsViewState extends State<EventsView> {
           _events = snapshot.docs
               .map((doc) => EventModel.fromFirestore(doc))
               .toList();
+
+          _filteredEvents = _events;
         });
       });
     });
@@ -49,6 +60,7 @@ class _EventsViewState extends State<EventsView> {
 
   @override
   Widget build(BuildContext context) {
+    bool isWide = MediaQuery.of(context).size.width > 600;
     return RawScrollbar(
       controller: _scrollController,
       thumbVisibility: true,
@@ -61,15 +73,62 @@ class _EventsViewState extends State<EventsView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              AppLocalizations.of(context)!.upcomingEvents,
-              style: OVTheme.bodyBase.copyWith(
-                fontWeight: FontWeight.w500,
-                letterSpacing: 1.1,
-                wordSpacing: 2,
-              ),
+            /*  Row(
+              children: [
+                Expanded(
+                  flex: isWide ? 9 : 4,
+                  child: LocationAutocomplete(
+                    controller: controller,
+                    service: LocationSearchService(),
+                    onSelected: (result) {
+                      print(result.label);
+                      print(result.type); // district | municipality
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: 46,
+                  child: Container(
+                    margin: const EdgeInsets.only(left: 8.0),
+                    child: ElevatedButton(
+                        onPressed: _isSearching
+                            ? null
+                            : _submitSearch,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: OVTheme.primaryRed,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(1),
+                          ),
+                          elevation: 4,
+                        ),
+                        child: Text(AppLocalizations.of(context)!.viewEvents,
+                            style: OVTheme.bodyBase.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500))),
+                  ),
+                )
+              ],
+            ), */
+            Row(
+              children: searchPainelWidget(isWide),
             ),
-            if (_events == null)
+            if (locationController.text.isEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 24.0),
+                child: Text(
+                  AppLocalizations.of(context)!.upcomingEvents,
+                  style: OVTheme.bodyBase.copyWith(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    letterSpacing: 1.1,
+                    wordSpacing: 2,
+                  ),
+                ),
+              ),
+            if (_filteredEvents == null)
               SizedBox(
                 height: 200,
                 child: Center(
@@ -81,7 +140,7 @@ class _EventsViewState extends State<EventsView> {
                         CircularProgressIndicator(color: OVTheme.primaryRed),
                         const SizedBox(height: 16),
                         Text(
-                          'Carregando eventos...',
+                          AppLocalizations.of(context)!.loading,
                           style: OVTheme.bodyBase.copyWith(
                             color: OVTheme.muted,
                           ),
@@ -91,26 +150,53 @@ class _EventsViewState extends State<EventsView> {
                   ),
                 ),
               ),
-            if (_events != null && _events!.isEmpty)
+            if (_filteredEvents != null && _filteredEvents!.isEmpty)
               Padding(
-                padding: const EdgeInsets.all(64.0),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 24.0, horizontal: 32.0),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Icon(
-                      Icons.event_busy,
-                      size: 64,
-                      color: OVTheme.muted,
+                      Icons.wine_bar,
+                      size: 48,
+                      color: Colors.grey.withOpacity(0.5),
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      AppLocalizations.of(context)!.noEventsForNow,
-                      style: OVTheme.titlesBase.copyWith(
-                        fontSize: 20,
-                        color: OVTheme.muted,
+                    const SizedBox(height: 12),
+                    FittedBox(
+                      child: Text(
+                        AppLocalizations.of(context)!
+                            .noEventsFoundByLocation(locationController.text),
+                        style: OVTheme.titlesBase.copyWith(
+                          fontSize: 20,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
+                    const SizedBox(height: 24),
+                    Text(
+                      AppLocalizations.of(context)!
+                          .noEventsFoundByLocationSecondary,
+                      style: OVTheme.bodyBase.copyWith(
+                        color: OVTheme.muted,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                     const SizedBox(height: 8),
+                    TextButton(
+                        onPressed: _resetSearch,
+                        style: TextButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(1),
+                          ),
+                          foregroundColor: OVTheme.primaryRed,
+                          backgroundColor: OVTheme.primaryRed,
+                        ),
+                        child: Text(
+                            AppLocalizations.of(context)!.discoverEvents,
+                            style: OVTheme.bodyBase.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500))),
                     Text(
                       AppLocalizations.of(context)!.sendEventSuggestion,
                       style: OVTheme.bodyBase.copyWith(
@@ -121,8 +207,8 @@ class _EventsViewState extends State<EventsView> {
                   ],
                 ),
               ),
-            if (_events != null)
-              ..._events!.map((event) => GestureDetector(
+            if (_filteredEvents != null)
+              ..._filteredEvents!.map((event) => GestureDetector(
                     onTap: () => context.go('/event_detail', extra: event),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -265,7 +351,7 @@ class _EventsViewState extends State<EventsView> {
                     ],
                   ),
                 ),
-              if ((event.paxPrice ?? 0) > 0 || (event.availableSeats ?? 0) > 0)
+              if ((event.paxPrice ?? 0) > 0 || (event.availableSeats) > 0)
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
@@ -303,11 +389,11 @@ class _EventsViewState extends State<EventsView> {
                               size: 16,
                             ),
                             SizedBox(width: 4),
-                            if (event.isFullyBooked)
+                            if (event.isSoldOut)
                               Flexible(
                                 child: SoldOutWidget(context: context),
                               ),
-                            if (!event.isFullyBooked)
+                            if (!event.isSoldOut)
                               Flexible(
                                 child: Text(
                                   AppLocalizations.of(context)!.seatsLeft(
@@ -328,5 +414,119 @@ class _EventsViewState extends State<EventsView> {
         ),
       ],
     );
+  }
+
+  /* transfer to a file and use it 
+  
+  Widget SoldOutWidget({required BuildContext context}) {
+    return Text(
+      AppLocalizations.of(context)!.soldOut,
+      style: OVTheme.bodyBase.copyWith(
+          color: OVTheme.primaryRed, fontWeight: FontWeight.w500),
+    );
+  } */
+
+  List<Widget> searchPainelWidget(bool isWide) {
+    return [
+      Expanded(
+        flex: isWide ? 9 : 4,
+        child: LocationAutocomplete(
+          controller: locationController,
+          onClear: _resetSearch,
+          onSelected: (result) {
+            print(result.label);
+            print(result.type);
+          },
+        ),
+      ),
+
+      /* FormBuilderDateRangePicker(
+              style: OVTheme.bodyBase,
+              name: 'quickSearchDateRange',
+              firstDate: DateTime(2020),
+              lastDate: DateTime(2030),
+              //   enableInteractiveSelection: false,
+              initialEntryMode: DatePickerEntryMode.calendarOnly,
+                
+              decoration: InputDecoration(
+                icon: Icon(Icons.calendar_today_outlined,
+                    color: OVTheme.muted),
+                border: OutlineInputBorder(
+                    borderSide:
+                        BorderSide(color: OVTheme.blackRetro, width: 1.2)),
+              ),
+            ), */
+      SizedBox(
+        height: 46,
+        child: Container(
+          margin: const EdgeInsets.only(left: 8.0),
+          child: ElevatedButton(
+              onPressed: _isSearching /* || controller.text.isEmpty */
+                  ? null
+                  : _submitSearch,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: OVTheme.primaryRed,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(1),
+                ),
+                elevation: 4,
+              ),
+              child: /* _isSearching
+                        ? SizedBox(
+                            height: 46,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white),
+                            ),
+                          )
+                        :  */
+                  Text(AppLocalizations.of(context)!.viewEvents,
+                      style: OVTheme.bodyBase.copyWith(
+                          color: Colors.white, fontWeight: FontWeight.w500))),
+        ),
+      )
+    ];
+  }
+
+  void _resetSearch() {
+    setState(() {
+      locationController.clear();
+      _filteredEvents = _events;
+    });
+  }
+
+  Future<void> _submitSearch() async {
+    if (locationController.text.isEmpty) {
+      setState(() {
+        //_filteredEvents = _events;
+      });
+      return;
+    }
+
+    setState(() {
+      _isSearching = true;
+    });
+
+    try {
+      FunctionResponseModel ret =
+          await FunctionsService.searchEvents(locationController.text);
+      if (ret.success) {
+        setState(() {
+          _filteredEvents = _events
+              ?.where((event) => ret.entitieIds.contains(event.id))
+              .toList();
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('AppLocalizations.of(context)!.searchError'),
+          backgroundColor: OVTheme.primaryRed,
+        ));
+      }
+    } finally {
+      if (mounted) setState(() => _isSearching = false);
+    }
   }
 }

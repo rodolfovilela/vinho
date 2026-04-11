@@ -57,7 +57,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                 child: buildEventCard(widget.event),
               ),
             ),
-            if (!widget.event.isFullyBooked)
+            if (!widget.event.isSoldOut)
               Positioned(
                 bottom: 4,
                 left: 16,
@@ -261,7 +261,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                                             size: 18,
                                           ),
                                           SizedBox(width: 4),
-                                          if (event.isFullyBooked)
+                                          if (event.isSoldOut)
                                             SoldOutWidget(context: context)
                                           else
                                             Flexible(
@@ -390,7 +390,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                   ],
                 ),
               ),
-              if (!widget.event.isFullyBooked &&
+              if (!widget.event.isSoldOut &&
                   event.hasMinimumPaxRequired &&
                   event.hasDeadlineForMinimumPax &&
                   event.bookedSeats != null &&

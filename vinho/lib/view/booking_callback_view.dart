@@ -17,11 +17,11 @@ class _BookingCallbackViewState extends State<BookingCallbackView> {
   Widget build(BuildContext context) {
     if (widget.bookingSummary.response!.success) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
             Text(
-              "${AppLocalizations.of(context)!.bookingConfirmed} - ${widget.bookingSummary.event.title}",
+              AppLocalizations.of(context)!.bookingConfirmed,
               style: OVTheme.titlesBase.copyWith(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -29,17 +29,26 @@ class _BookingCallbackViewState extends State<BookingCallbackView> {
               ),
             ),
             Container(
+              margin: const EdgeInsets.only(top: 24.0),
               width: double.infinity,
-              decoration: BoxDecoration(),
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (widget.bookingSummary.event.title != null)
+                      Text(
+                        widget.bookingSummary.event.title ?? '',
+                        style: OVTheme.titlesBase.copyWith(
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                          fontSize: 21,
+                        ),
+                      ),
                     Padding(
                       padding: const EdgeInsets.only(top: 16.0),
                       child: Row(
                         children: [
-                          Icon(Icons.chair_alt,
+                          Icon(Icons.people_outline,
                               color: OVTheme.primaryRed, size: 20),
                           SizedBox(width: 8),
                           Text(

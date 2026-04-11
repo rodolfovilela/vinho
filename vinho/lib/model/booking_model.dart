@@ -32,7 +32,7 @@ class BookingModel {
     return BookingModel(
       id: json['id'] as String?,
       eventId: json['eventId'] as String,
-      seats: FirestoreParser.toInt(json['seats'] ?? 0),
+      seats: FirestoreParser.toInt(json['seats']) ?? 0,
       name: json['name'] as String,
       email: json['email'] as String,
       phone: json['phone'] as String,

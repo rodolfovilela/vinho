@@ -9,6 +9,8 @@ import 'package:vinho/model/booking_summary_model.dart';
 import 'package:vinho/model/event_model.dart';
 import 'package:vinho/model/function_response_model.dart';
 import 'package:vinho/services/auth_service.dart';
+import 'package:vinho/services/location.dart';
+import 'package:vinho/services/seed_service.dart';
 import 'package:vinho/theme/ov_theme.dart';
 import 'package:vinho/view/booking_callback_view.dart';
 import 'package:vinho/view/booking_view.dart';
@@ -17,8 +19,8 @@ import 'package:vinho/view/events_view.dart';
 import 'package:vinho/view/leads_view.dart';
 import 'package:vinho/view/login_view.dart';
 import 'package:vinho/view/privacy_policy_view.dart';
+import 'package:vinho/view/quick_search_view.dart';
 import 'package:vinho/widgets/dialog.dart';
-import 'package:vinho/widgets/footer.dart';
 import 'package:vinho/widgets/logo.dart';
 
 import 'firebase_options.dart';
@@ -33,8 +35,10 @@ void main() async {
   // await SeedService.seedEvents();
 
   // await SeedService.disableEvents(); // Disable all events (for testing empty state)
-
-  AuthService.ensureAuth().then((_) {
+  //await SeedService.seedLocations(); // Seed Portugal locations (run once)
+  AuthService.ensureAuth().then((_) async {
+    LocationSearchService.locations =
+        await LocationSearchService.loadLocations();
     runApp(const MyApp());
   });
 }
@@ -106,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
     _scrollController = ScrollController();
     /* BookingSummaryModel bookingSummary = BookingSummaryModel(
         booking: BookingModel(
@@ -151,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    /*  BookingSummaryModel bookingSummary = BookingSummaryModel(
+    BookingSummaryModel bookingSummary = BookingSummaryModel(
         booking: BookingModel(
             eventId: 'eventId',
             seats: 2,
@@ -168,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
             minimumPaxRequired: 10,
             location: 'Event Location'),
         response: FunctionResponseModel(
-            success: true, messageKey: 'booking-submitted')); */
+            success: true, messageKey: 'booking-submitted'));
 
     if (widget.bookingSummary != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -178,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
             barrierColor: OVTheme.semiTransparent,
             builder: (context) => OVDialog(
               isFullscreen: false,
-              content: BookingCallbackView(widget.bookingSummary!),
+              content: BookingCallbackView(/*  */ widget.bookingSummary!),
             ),
           );
         }
@@ -217,21 +222,16 @@ class _HomeScreenState extends State<HomeScreen> {
           thickness: 3,
           child: SingleChildScrollView(
             controller: _scrollController,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-              height: MediaQuery.of(context).size.height -
-                  kToolbarHeight -
-                  MediaQuery.of(context).padding.top,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  /* QuickSearchView(), 
-                  SizedBox(height: 16), */
-                  EventsView(),
-                ],
-              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    EventsView(),
+                  ],
+                ),
+
+
             ),
           ),
         ),

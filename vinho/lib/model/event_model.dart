@@ -2,9 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EventModel {
   static EventModel fromFirestore(DocumentSnapshot doc) {
-    final raw = doc.data() as Map<String, dynamic>;
+    final raw = doc.data();
+    if (raw == null) throw Exception('Event data is null');
 
-    final data = Map<String, dynamic>.from(raw);
+    final data = Map<String, dynamic>.from(raw as Map);
 
     data['id'] = doc.id;
 
@@ -22,7 +23,8 @@ class EventModel {
       time: json['time'] as String?,
       location: json['location'] as String?,
       address: json['address'] as String?,
-      region: json['region'] as String?,
+      district: json['district'] as String?,
+      municipality: json['municipality'] as String?,
       hostName: json['hostName'] as String?,
       sommelierName: json['sommelierName'] as String?,
       sommelierImgUrl: json['sommelierImgUrl'] as String?,
@@ -49,7 +51,8 @@ class EventModel {
       'time': time,
       'location': location,
       'address': address,
-      'region': region,
+      'district': district,
+      'municipality': municipality,
       'hostName': hostName,
       'sommelierName': sommelierName,
       'sommelierImgUrl': sommelierImgUrl,
@@ -73,7 +76,8 @@ class EventModel {
   String? time;
   String? location;
   String? address;
-  String? region;
+  String? district;
+  String? municipality;
   String? hostName;
   String? sommelierName;
   String? sommelierImgUrl;
@@ -96,7 +100,8 @@ class EventModel {
     this.date,
     this.location,
     this.address,
-    this.region,
+    this.district,
+    this.municipality,
     this.hostName,
     this.sommelierName,
     this.sommelierImgUrl,
@@ -111,11 +116,12 @@ class EventModel {
   });
 
   int get availableSeats {
-    if (totalSeats == null) return 0;
-    return totalSeats! - bookedSeats!;
+    final total = totalSeats ?? 0;
+    final booked = bookedSeats ?? 0;
+    return total - booked;
   }
 
-  bool get isFullyBooked => availableSeats <= 0;
+  bool get isSoldOut => availableSeats <= 0;
   bool get hasMaxSeatsPerBooking => maxSeatsPerBooking != null;
   bool get hasMinimumPaxRequired => minimumPaxRequired != null;
   bool get hasDeadlineForMinimumPax => deadlineForMinimumPax != null;
