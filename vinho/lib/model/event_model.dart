@@ -21,6 +21,9 @@ class EventModel {
       image: json['image'] as String?,
       date: json['date'] as String?,
       time: json['time'] as String?,
+      timestamp: json['timestamp'] != null
+          ? (json['timestamp'] as Timestamp?)?.toDate()
+          : null,
       location: json['location'] as String?,
       address: json['address'] as String?,
       district: json['district'] as String?,
@@ -34,8 +37,9 @@ class EventModel {
       totalSeats: (json['totalSeats'] as dynamic)?.toInt(),
       minimumPaxRequired: (json['minimumPaxRequired'] as dynamic)?.toInt(),
       maxSeatsPerBooking: (json['maxSeatsPerBooking'] as dynamic)?.toInt(),
-      deadlineForMinimumPax:
-          (json['deadlineForMinimumPax'] as Timestamp?)?.toDate(),
+      deadlineForMinimumPax: json['deadlineForMinimumPax'] != null
+          ? (json['deadlineForMinimumPax'] as Timestamp?)?.toDate()
+          : null,
       adPriority: (json['adPriority'] as dynamic)?.toInt(),
     );
   }
@@ -49,6 +53,7 @@ class EventModel {
       'image': image,
       'date': date,
       'time': time,
+      'timestamp': timestamp,
       'location': location,
       'address': address,
       'district': district,
@@ -73,6 +78,7 @@ class EventModel {
   String? detailedDesc;
   String? image;
   String? date;
+  DateTime? timestamp;
   String? time;
   String? location;
   String? address;
@@ -98,6 +104,7 @@ class EventModel {
     this.image,
     this.order,
     this.date,
+    this.timestamp,
     this.location,
     this.address,
     this.district,

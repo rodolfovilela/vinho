@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/model/location_result_model.dart';
 import 'package:vinho/services/location.dart';
@@ -8,56 +7,83 @@ import 'package:vinho/theme/ov_theme.dart';
 class LocationAutocomplete extends StatefulWidget {
   final Function(LocationResult) onSelected;
   final Function() onClear;
-  final TextEditingController controller;
-  final LocationSearchService service = LocationSearchService();
+  final Function(String) onTextChanged;
 
-  LocationAutocomplete({
-    super.key,
-    required this.onSelected,
-    required this.controller,
-    required this.onClear,
-  });
+  const LocationAutocomplete(
+      {super.key,
+      required this.onSelected,
+      required this.onClear,
+      required this.onTextChanged});
 
   @override
-  State<LocationAutocomplete> createState() => _LocationAutocompleteState();
+  LocationAutocompleteState createState() => LocationAutocompleteState();
 }
 
-class _LocationAutocompleteState extends State<LocationAutocomplete> {
-  bool isLocationFilled = false;
+class LocationAutocompleteState extends State<LocationAutocomplete> {
+  final LocationSearchService _service = LocationSearchService();
+
+  TextEditingController? _controller;
+
+  bool _isFilled = false;
+
+  void clear({bool notify = false}) {
+    _controller?.clear();
+    setState(() {
+      _isFilled = false;
+    });
+    if (notify) {
+      widget.onClear();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Autocomplete<LocationResult>(
       displayStringForOption: (option) => option.label,
-      optionsBuilder: (TextEditingValue textEditingValue) {
+      optionsBuilder: (TextEditingValue value) {
         setState(() {
-          isLocationFilled = textEditingValue.text.isNotEmpty;
+          _isFilled = value.text.isNotEmpty;
         });
-        widget.controller.text = textEditingValue.text;
-        return widget.service.search(textEditingValue.text);
+
+        if (value.text.isEmpty) {
+          return const Iterable<LocationResult>.empty();
+        }
+
+        return _service.search(value.text);
       },
-      onSelected: widget.onSelected,
+      onSelected: (LocationResult value) {
+        _controller?.text = value.label;
+        widget.onSelected(value);
+      },
       fieldViewBuilder: (context, controller, focusNode, onSubmit) {
-        return FormBuilderTextField(
-          name: 'location',
-          style: OVTheme.bodyBase.copyWith(fontSize: 16),
+        _controller = controller;
+
+        controller.removeListener(_onTextChanged);
+        controller.addListener(_onTextChanged);
+
+        return TextField(
           controller: controller,
           focusNode: focusNode,
+          style: OVTheme.bodyBase.copyWith(fontSize: 16),
           decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: OVTheme.blackRetro, width: 1.2)),
+              borderSide: BorderSide(
+                color: OVTheme.blackRetro,
+                width: 1.2,
+              ),
+            ),
             hintText: AppLocalizations.of(context)!.locationPlaceholder,
             contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-            prefixIcon: Icon(Icons.location_on_outlined,
-                size: 18, color: OVTheme.muted),
-            suffixIcon: isLocationFilled
+            prefixIcon: Icon(
+              Icons.location_on_outlined,
+              size: 18,
+              color: OVTheme.muted,
+            ),
+            suffixIcon: _isFilled
                 ? IconButton(
-                    icon: Icon(Icons.clear, size: 20),
+                    icon: const Icon(Icons.clear, size: 20),
                     onPressed: () {
-                      controller.clear();
-                      widget.onClear();
-                      setState(() {
-                        isLocationFilled = false;
-                      });
+                      clear(notify: true);
                     },
                   )
                 : null,
@@ -68,14 +94,26 @@ class _LocationAutocompleteState extends State<LocationAutocomplete> {
         return Align(
           alignment: Alignment.topLeft,
           child: Material(
-            color: Colors.white,
             elevation: 4,
+            color: Colors.white,
             child: Container(
               width: MediaQuery.of(context).size.width * 0.7,
               constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.6,
-                  minHeight: 100),
-              child: ListView.builder(
+                maxHeight: MediaQuery.of(context).size.height * 0.6,
+                minHeight: 100,
+              ),
+              child: /*  options.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        AppLocalizations.of(context)!.noResults,
+                        style: OVTheme.bodyBase.copyWith(
+                          color: OVTheme.muted,
+                        ),
+                      ),
+                    )
+                  :  */
+                  ListView.builder(
                 padding: EdgeInsets.zero,
                 itemCount: options.length,
                 itemBuilder: (context, index) {
@@ -93,7 +131,7 @@ class _LocationAutocompleteState extends State<LocationAutocomplete> {
                       option.type == LocationType.district
                           ? AppLocalizations.of(context)!.district
                           : option.districtCode,
-                      style: TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 12),
                     ),
                     onTap: () => onSelected(option),
                   );
@@ -105,8 +143,8 @@ class _LocationAutocompleteState extends State<LocationAutocomplete> {
       },
     );
   }
-/* 
-  String _formatDistrict(String code) {
-    return code[0] + code.substring(1).toLowerCase();
-  } */
+
+  void _onTextChanged() {
+    widget.onTextChanged(_controller?.text ?? '');
+  }
 }

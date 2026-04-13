@@ -15,7 +15,7 @@ class FunctionResponseModel {
       success: map['success'] ?? false,
       messageKey: map['messageKey'] ?? '',
       errorCode: map['errorCode'] ?? '',
-      entitieIds: List<String>.from(map['entities']?.map((e) => e['id']) ?? []),
+      entitieIds: List<String>.from(map['entities']?.map((e) => e['id'].toString()) ?? []),
     );
   }
 }

@@ -3,8 +3,8 @@
 import * as admin from 'firebase-admin';
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 //import { Resend } from 'resend';
+import { Query, Timestamp } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions/logger';
-import { Filter, Query } from 'firebase-admin/firestore';
 
 if (!admin.apps.length) {
   admin.initializeApp();
@@ -15,54 +15,73 @@ if (!admin.apps.length) {
 export const searchEvents = onCall(
   { region: "europe-west1" },
   async (request) => {
-    const location: String = request.data.location;
+    try {
+      const location: String = normalize(request.data.location).toUpperCase();
 
-    const db = admin.firestore();
-    const eventsRef = db.collection("events");
-    const q: Query = eventsRef
-      .where("date", ">=", admin.firestore.Timestamp.now())
+      const isValidLocation = location && typeof location === 'string' && location.trim() !== '';
 
-    if (location && typeof location === 'string' && location.trim() !== '') {
-      logger.info("Querying events with location filter", { location });
+      if (isValidLocation) {
+        logger.info("Querying events with location filter", location);
+        const db = admin.firestore();
+        const eventsRef = db.collection("events");
+        let q: Query = eventsRef
+          .where("timestamp", ">=", admin.firestore.Timestamp.now())
 
-      q.where(Filter.or(Filter.where("location.district", "==", location),
-        Filter.where("location.municipality", "==", location)));
+        /* q.where(Filter.or(Filter.where("district", "==", location),
+          Filter.where("municipality", "==", location))); */
+        q = q.where("locationKeys", "array-contains", location);
 
-      logSearchResults(location);
+        const snapshot = await q.get();
+
+        const entities = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        if (entities.length == 0) {
+          logSearchResults(location.toUpperCase());
+        }
+
+        return { success: true, entities };
+      } else {
+        return { success: true, entities: [] };
+      }
+    } catch (err) {
+      logger.error("Failed to search query", { location, error: err });
+      return { success: true, entities: [] };
     }
-
-    const snapshot = await q.get();
-
-    const entities = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    return { success: true, entities };
-
   });
 
 const logSearchResults = async (location: string) => {
-  const searchLogsRef = admin.firestore().collection("searchLogs");
+  const db = admin.firestore();
+  const logActiveData = (await db.collection('config').doc('search_analytics').get()).data();
+  const logActive = (logActiveData?.active ?? false) as boolean;
 
-  try {
-    const searchLogsSnapshot = await searchLogsRef.where("location", "==", location).get();
-    const now = admin.firestore.FieldValue.serverTimestamp();
+  if (logActive) {
+    const searchLogsRef = admin.firestore().collection("searchLogs");
 
-    if (searchLogsSnapshot.empty) {
-      searchLogsRef.add({
-        location: location,
-        lastSearchTimestamp: now,
-        count: 1,
-        timestamps: [now]
-      });
-    } else {
-      const doc = searchLogsSnapshot.docs[0];
+    try {
+      const now = Timestamp.now();
 
-      doc.ref.update({
+      /*  const searchLogsSnapshot = await searchLogsRef.where("location", "==", location).get();
+       const now = Timestamp.now();
+   
+       if (searchLogsSnapshot.empty) {
+         searchLogsRef.add({
+           location: location,
+           lastSearchTimestamp: now,
+           count: 1,
+           timestamps: [now]
+         });
+       } else {
+         const doc = searchLogsSnapshot.docs[0]; */
+
+      searchLogsRef.doc(location).set({
         lastSearchTimestamp: now,
         count: admin.firestore.FieldValue.increment(1),
         timestamps: admin.firestore.FieldValue.arrayUnion(now)
-      });
+      }, { merge: true });
+      /*  } */
+    } catch (err) {
+      logger.error("Failed to log search query", { location, error: err });
     }
-  } catch (err) {
-    logger.error("Failed to log search query", { location, error: err });
   }
 }
 
@@ -126,7 +145,7 @@ export const bookSeats = onCall(
           email: email.trim().toLowerCase(),
           phone: phone ? phone.trim() : null,
           requestedSeats: requestedSeats,
-          timestamp: admin.firestore.FieldValue.serverTimestamp()
+          timestamp: Timestamp.now()
         });
 
         throw new HttpsError("failed-precondition", "not-enough-seats");
@@ -138,7 +157,7 @@ export const bookSeats = onCall(
         phone: phone ? phone.trim() : null,
         email: email.trim().toLowerCase(),
         requestedSeats: requestedSeats,
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
+        createdAt: Timestamp.now()
       });
 
       tx.update(eventRef, {
@@ -247,3 +266,20 @@ class OvaException extends HttpsError {
   }
 }
  */
+
+const normalize = (input: string) => {
+  return (input ?? '')
+    .toLowerCase()
+    .replace(/á/gi, 'a')
+    .replace(/à/gi, 'a')
+    .replace(/ã/gi, 'a')
+    .replace(/â/gi, 'a')
+    .replace(/é/gi, 'e')
+    .replace(/ê/gi, 'e')
+    .replace(/í/gi, 'i')
+    .replace(/ó/gi, 'o')
+    .replace(/õ/gi, 'o')
+    .replace(/ô/gi, 'o')
+    .replace(/ú/gi, 'u')
+    .replace(/ç/gi, 'c');
+}

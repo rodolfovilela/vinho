@@ -50,8 +50,9 @@ class _QuickSearchViewState extends State<QuickSearchView> {
             child: Column(
               children: [
                 LocationAutocomplete(
+                  onTextChanged:  (g){},
                     onClear: () {},
-                  controller: locationController,
+               //   controller: locationController,
                   onSelected: (result) {
                     print(result.label);
                     print(result.type); // district | municipality

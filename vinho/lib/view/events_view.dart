@@ -20,12 +20,15 @@ class EventsView extends StatefulWidget {
 }
 
 class _EventsViewState extends State<EventsView> {
+  final GlobalKey<LocationAutocompleteState> locationKey =
+      GlobalKey<LocationAutocompleteState>();
   final ScrollController _scrollController = ScrollController();
   List<EventModel>? _events, _searchResults, _filteredEvents;
   late final FirestoreService _firestoreService;
   bool _isSearching = false;
-  TextEditingController locationController = TextEditingController();
+ // TextEditingController locationController = TextEditingController();
   final _formKey = GlobalKey<FormBuilderState>();
+  String _locationQuery = '';
 
   @override
   void initState() {
@@ -115,7 +118,7 @@ class _EventsViewState extends State<EventsView> {
             Row(
               children: searchPainelWidget(isWide),
             ),
-            if (locationController.text.isEmpty)
+            if (_locationQuery.isEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 24.0),
                 child: Text(
@@ -151,14 +154,17 @@ class _EventsViewState extends State<EventsView> {
                 ),
               ),
             if (_filteredEvents != null && _filteredEvents!.isEmpty)
-              Padding(
+              Container(
+                width: double.infinity,
                 padding: const EdgeInsets.symmetric(
-                    vertical: 24.0, horizontal: 32.0),
+                  vertical: 24.0, /* horizontal: 8.0 */
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.wine_bar,
+                      Icons.wine_bar_outlined,
                       size: 48,
                       color: Colors.grey.withOpacity(0.5),
                     ),
@@ -166,43 +172,48 @@ class _EventsViewState extends State<EventsView> {
                     FittedBox(
                       child: Text(
                         AppLocalizations.of(context)!
-                            .noEventsFoundByLocation(locationController.text),
+                            .noEventsFoundByLocation(_locationQuery),
                         style: OVTheme.titlesBase.copyWith(
                           fontSize: 20,
                         ),
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    Text(
-                      AppLocalizations.of(context)!
-                          .noEventsFoundByLocationSecondary,
-                      style: OVTheme.bodyBase.copyWith(
-                        color: OVTheme.muted,
+                    const SizedBox(height: 8),
+                    FittedBox(
+                      child: Text(
+                        AppLocalizations.of(context)!
+                            .noEventsFoundByLocationSecondary,
+                        style: OVTheme.bodyBase.copyWith(
+                          color: OVTheme.muted,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
-                    TextButton(
-                        onPressed: _resetSearch,
-                        style: TextButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(1),
+                    FittedBox(
+                      child: TextButton(
+                          onPressed: _resetSearch,
+                          style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(1),
+                            ),
+                            foregroundColor: OVTheme.primaryRed,
+                            backgroundColor: OVTheme.primaryRed,
                           ),
-                          foregroundColor: OVTheme.primaryRed,
-                          backgroundColor: OVTheme.primaryRed,
-                        ),
-                        child: Text(
-                            AppLocalizations.of(context)!.discoverEvents,
-                            style: OVTheme.bodyBase.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500))),
-                    Text(
-                      AppLocalizations.of(context)!.sendEventSuggestion,
-                      style: OVTheme.bodyBase.copyWith(
-                        color: OVTheme.muted,
+                          child: Text(
+                              AppLocalizations.of(context)!.discoverEvents,
+                              style: OVTheme.bodyBase.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500))),
+                    ),
+                    const SizedBox(height: 48),
+                    FittedBox(
+                      child: Text(
+                        AppLocalizations.of(context)!.sendEventSuggestion,
+                        style: OVTheme.bodyBase,
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),
@@ -431,8 +442,14 @@ class _EventsViewState extends State<EventsView> {
       Expanded(
         flex: isWide ? 9 : 4,
         child: LocationAutocomplete(
-          controller: locationController,
-          onClear: _resetSearch,
+          key: locationKey,
+          //   controller: locationController,
+          onClear: () {
+            _resetSearch();
+          },
+          onTextChanged: (text) {
+            _locationQuery = text;
+          },
           onSelected: (result) {
             print(result.label);
             print(result.type);
@@ -493,13 +510,13 @@ class _EventsViewState extends State<EventsView> {
 
   void _resetSearch() {
     setState(() {
-      locationController.clear();
+      locationKey.currentState?.clear();
       _filteredEvents = _events;
     });
   }
 
   Future<void> _submitSearch() async {
-    if (locationController.text.isEmpty) {
+    if (_locationQuery.isEmpty) {
       setState(() {
         //_filteredEvents = _events;
       });
@@ -512,8 +529,9 @@ class _EventsViewState extends State<EventsView> {
 
     try {
       FunctionResponseModel ret =
-          await FunctionsService.searchEvents(locationController.text);
+          await FunctionsService.searchEvents(_locationQuery);
       if (ret.success) {
+        print(ret.entitieIds);
         setState(() {
           _filteredEvents = _events
               ?.where((event) => ret.entitieIds.contains(event.id))
