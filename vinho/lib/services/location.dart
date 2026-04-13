@@ -57,7 +57,6 @@ class LocationSearchService {
     final data = doc.data() as Map<String, dynamic>;
 
     return data.map((key, value) {
-      print(formatDistrict(key));
       return MapEntry(
         formatDistrict(key),
         List<String>.from(value),

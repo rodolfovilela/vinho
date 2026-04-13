@@ -10,6 +10,7 @@ import 'package:vinho/services/location.dart';
 import 'package:vinho/theme/ov_theme.dart';
 import 'package:vinho/util/layout.dart';
 import 'package:vinho/view/event_detail_view.dart';
+import 'dart:async';
 import 'package:vinho/widgets/location_autocomplete.dart';
 
 class EventsView extends StatefulWidget {
@@ -26,9 +27,10 @@ class _EventsViewState extends State<EventsView> {
   List<EventModel>? _events, _searchResults, _filteredEvents;
   late final FirestoreService _firestoreService;
   bool _isSearching = false;
- // TextEditingController locationController = TextEditingController();
+  // TextEditingController locationController = TextEditingController();
   final _formKey = GlobalKey<FormBuilderState>();
   String _locationQuery = '';
+  StreamSubscription<dynamic>? _eventsSubscription;
 
   @override
   void initState() {
@@ -36,16 +38,18 @@ class _EventsViewState extends State<EventsView> {
     _firestoreService = FirestoreService();
     // controller = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _firestoreService
+      _eventsSubscription = _firestoreService
           .getEventsStream(Localizations.localeOf(context).languageCode)
           .listen((snapshot) {
-        setState(() {
-          _events = snapshot.docs
-              .map((doc) => EventModel.fromFirestore(doc))
-              .toList();
+        if (mounted) {
+          setState(() {
+            _events = snapshot.docs
+                .map((doc) => EventModel.fromFirestore(doc))
+                .toList();
 
-          _filteredEvents = _events;
-        });
+            _filteredEvents = _events;
+          });
+        }
       });
     });
   }
@@ -57,6 +61,7 @@ class _EventsViewState extends State<EventsView> {
 
   @override
   void dispose() {
+    _eventsSubscription?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
@@ -352,7 +357,12 @@ class _EventsViewState extends State<EventsView> {
                       SizedBox(width: 4),
                       Flexible(
                         child: Text(
-                          event.location!,
+                          event.location! +
+                              (event.municipality!.isNotEmpty
+                                  ? ' (${event.municipality})'
+                                  : event.district!.isNotEmpty
+                                      ? ' (${event.district})'
+                                      : ''),
                           style: OVTheme.bodyBase.copyWith(
                             color: OVTheme.muted,
                           ),

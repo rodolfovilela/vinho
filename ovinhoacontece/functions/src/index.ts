@@ -33,7 +33,7 @@ export const searchEvents = onCall(
 
         const snapshot = await q.get();
 
-        const entities = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const entities = snapshot.docs.map(doc => ({ id: doc.id/* , ...doc.data() */ }));
 
         if (entities.length == 0) {
           logSearchResults(location.toUpperCase());
