@@ -124,7 +124,7 @@ class _BookingViewState extends State<BookingView> {
                       width: double.infinity,
                       child: ElevatedButton(
                           onPressed: _isSubmitting ||
-                                  (_formKey.currentState != null &&
+                                  (_formKey.currentState == null ||
                                       !_formKey.currentState!.validate())
                               ? null
                               : _submitBooking,
@@ -167,6 +167,9 @@ class _BookingViewState extends State<BookingView> {
     return Form(
       key: _formKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
+      onChanged: () => setState(() {
+        
+      }),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
