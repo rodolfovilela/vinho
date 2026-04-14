@@ -73,10 +73,11 @@ class LocationAutocompleteState extends State<LocationAutocomplete> {
               ),
             ),
             hintText: AppLocalizations.of(context)!.locationPlaceholder,
+            hintStyle: TextStyle(fontSize: 13),
             contentPadding: const EdgeInsets.symmetric(horizontal: 8),
             prefixIcon: Icon(
               Icons.location_on_outlined,
-              size: 18,
+              size: 13,
               color: OVTheme.muted,
             ),
             suffixIcon: _isFilled

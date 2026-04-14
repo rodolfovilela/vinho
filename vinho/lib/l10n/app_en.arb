@@ -32,7 +32,7 @@
   "invalidCallingCode": "Invalid calling code (e.g. +351)",
   "phoneNumber":"Phone Number",
   "phoneRequired": "We need your phone number",
-  "locationPlaceholder": "Where would you like to see events?",
+  "locationPlaceholder": "Where to taste?",
   "search": "Search",
   "viewEvents": "View events",
   "district": "District",
@@ -46,7 +46,7 @@
   "bookingSuccessfullyDone":"Reservation confirmed. See you soon!",
   "bookingError": "We're sorry we couldn't reserve your seats at this moment",
   "privacyPolicyDisclaimer": "We will only use your data to manage your booking and communicate information about the event.",
-  "privacyPolicyError":"Please accept the privacy policy.",
+  "privacyPolicyError":"You must accept the privacy policy to continue",
   "iHaveReadAndAccept":"I have read and accept the",
   "privacyPolicy":"Privacy Policy",
   "minimumPaxRequiredWithDeadlineDisclaimer": "This event needs, at least, {minimumPaxRequired} booked seats to be confirmed. We will let you know if it's going to happen by {deadlineForMinimumPax}",
@@ -62,6 +62,7 @@
   "enterDigitsCode":"Enter the 4-digit code",
   "confirmButton": "Confirm booking",
   "invalidCode": "Invalid code",
-  "soldOut": "Sold out"
+  "soldOut": "Sold out",
+  "payAtTheEvent":"You’ll pay at the event"
 }
 

@@ -336,25 +336,43 @@ class _EventDetailViewState extends State<EventDetailView> {
                           padding: const EdgeInsets.only(top: 8.0),
                           child: FittedBox(
                             fit: BoxFit.scaleDown,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(
-                                  Icons.money_outlined,
-                                  color: OVTheme.primaryRed,
-                                  size: 18,
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.money_outlined,
+                                      color: OVTheme.primaryRed,
+                                      size: 18,
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      (event.paxPrice != null &&
+                                              event.paxPrice! > 0)
+                                          ? formatCurrency
+                                              .format(event.paxPrice)
+                                          : AppLocalizations.of(context)!
+                                              .freeEntrance,
+                                      style: OVTheme.bodyBase.copyWith(
+                                          color: OVTheme.primaryColor,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ],
                                 ),
-                                SizedBox(width: 4),
-                                Text(
-                                  (event.paxPrice != null &&
-                                          event.paxPrice! > 0)
-                                      ? formatCurrency.format(event.paxPrice)
-                                      : AppLocalizations.of(context)!
-                                          .freeEntrance,
-                                  style: OVTheme.bodyBase.copyWith(
-                                      color: OVTheme.primaryColor,
-                                      fontWeight: FontWeight.w600),
-                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(width: 22),
+                                    Text(
+                                      AppLocalizations.of(context)!.payAtTheEvent,
+                                      style: OVTheme.bodyBase.copyWith(
+                                        color: OVTheme.muted,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ],
+                                )
                               ],
                             ),
                           ),

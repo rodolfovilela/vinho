@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/l10n_helper/l10n_helper.dart';
 import 'package:vinho/theme/ov_theme.dart';
+import 'package:vinho/widgets/language.dart';
 
 class Footer extends StatelessWidget {
   const Footer({super.key});
@@ -41,29 +42,7 @@ class Footer extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              PopupMenuButton<Locale>(
-                tooltip: AppLocalizations.of(context)!.changeLanguage,
-                icon: Icon(Icons.language, size: 20, color: OVTheme.vaporwaveGray),
-                padding: EdgeInsets.zero,
-                color: Colors.white,
-                itemBuilder: (BuildContext context) => [
-                  PopupMenuItem<Locale>(
-                    textStyle:
-                        OVTheme.bodyBase.copyWith(color: OVTheme.vaporwaveGray),
-                    value: Locale('pt'),
-                    child: Text('Português'),
-                  ),
-                  PopupMenuItem<Locale>(
-                    textStyle:
-                        OVTheme.bodyBase.copyWith(color: OVTheme.vaporwaveGray),
-                    value: Locale('en'),
-                    child: Text('English'),
-                  ),
-                ],
-                onSelected: (Locale locale) {
-                  L10nHelper.of(context).changeLocale(locale);
-                },
-              ),
+              AppLanguage()
             ],
           ),
           Row(

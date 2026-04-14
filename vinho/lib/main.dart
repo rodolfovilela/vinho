@@ -10,7 +10,6 @@ import 'package:vinho/model/event_model.dart';
 import 'package:vinho/model/function_response_model.dart';
 import 'package:vinho/services/auth_service.dart';
 import 'package:vinho/services/location.dart';
-import 'package:vinho/services/seed_service.dart';
 import 'package:vinho/theme/ov_theme.dart';
 import 'package:vinho/view/booking_callback_view.dart';
 import 'package:vinho/view/booking_view.dart';
@@ -19,8 +18,8 @@ import 'package:vinho/view/events_view.dart';
 import 'package:vinho/view/leads_view.dart';
 import 'package:vinho/view/login_view.dart';
 import 'package:vinho/view/privacy_policy_view.dart';
-import 'package:vinho/view/quick_search_view.dart';
 import 'package:vinho/widgets/dialog.dart';
+import 'package:vinho/widgets/language.dart';
 import 'package:vinho/widgets/logo.dart';
 
 import 'firebase_options.dart';
@@ -204,6 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
+          AppLanguage(),
           IconButton(
             icon: const Icon(Icons.menu),
             iconSize: 28,

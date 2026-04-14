@@ -5,8 +5,8 @@
   "searchHint": "Localização...",
   "loading":"A carregar...",
   "changeLanguage":"Mudar idioma",
-  "seatsLeft": "{seatsLeft} lugares restantes",
-  "onlySeatsLeft": "Restam apenas {seatsLeft} lugares",
+  "seatsLeft": "{seatsLeft} lugares disponíveis",
+  "onlySeatsLeft": "Apenas {seatsLeft} lugares disponíveis",
   "paxPrice": "{paxPrice} por pessoa",
   "freeEntrance":"Entrada gratuita",
   "aboutThisEvent": "Sobre o evento",
@@ -32,7 +32,7 @@
   "invalidCallingCode": "Inválido (e.g. +351)",
   "phoneNumber":"Número de telefone",
   "phoneRequired": "Precisamos do seu número de telefone",
-  "locationPlaceholder": "Onde queres ver eventos?",
+  "locationPlaceholder": "Onde quer provar?",
   "search": "Pesquisar",
   "viewEvents": "Ver eventos",
   "district": "Distrito",
@@ -46,7 +46,7 @@
   "bookingSuccessfullyDone":"Reserva efetuada. Até já!",
   "bookingError": "Lamentamos mas não foi possível reservar seus lugares",
   "privacyPolicyDisclaimer": "Usaremos seus dados apenas para gerir sua reserva e comunicar informações sobre o evento.",
-  "privacyPolicyError":"Por favor, aceite a política de privacidade.",
+  "privacyPolicyError":"Deve aceitar a política de privacidade para continuar",
   "iHaveReadAndAccept":"Li e aceito a",
   "privacyPolicy":"política de privacidade",
   "minimumPaxRequiredWithDeadlineDisclaimer":"Este evento requer, no mínimo, {minimumPaxRequired} assentos reservados para ser confirmado. Informaremos se ele será realizado até o dia {deadlineForMinimumPax}.",
@@ -62,5 +62,6 @@
   "enterDigitsCode":"Introduza o código de 4 dígitos",
   "confirmButton": "Confirmar reserva",
   "invalidCode": "Código inválido",
-  "soldOut": "Evento esgotado"
+  "soldOut": "Evento esgotado",
+  "payAtTheEvent":"O pagamento deverá ser feito no evento"
 }

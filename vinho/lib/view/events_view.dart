@@ -486,7 +486,7 @@ class _EventsViewState extends State<EventsView> {
       SizedBox(
         height: 46,
         child: Container(
-          margin: const EdgeInsets.only(left: 8.0),
+          margin: const EdgeInsets.only(left: 4.0),
           child: ElevatedButton(
               onPressed: _isSearching /* || controller.text.isEmpty */
                   ? null
@@ -494,7 +494,7 @@ class _EventsViewState extends State<EventsView> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: OVTheme.primaryRed,
                 foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+//                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(1),
                 ),
@@ -512,7 +512,7 @@ class _EventsViewState extends State<EventsView> {
                         :  */
                   Text(AppLocalizations.of(context)!.viewEvents,
                       style: OVTheme.bodyBase.copyWith(
-                          color: Colors.white, fontWeight: FontWeight.w500))),
+                          color: Colors.white, fontSize: 14))),
         ),
       )
     ];
