@@ -136,7 +136,7 @@ class _EventsViewState extends State<EventsView> {
                   ),
                 ),
               ),
-            if (_filteredEvents == null)
+            if (_filteredEvents == null && _isSearching)
               SizedBox(
                 height: 200,
                 child: Center(
@@ -511,8 +511,8 @@ class _EventsViewState extends State<EventsView> {
                           )
                         :  */
                   Text(AppLocalizations.of(context)!.viewEvents,
-                      style: OVTheme.bodyBase.copyWith(
-                          color: Colors.white, fontSize: 14))),
+                      style: OVTheme.bodyBase
+                          .copyWith(color: Colors.white, fontSize: 14))),
         ),
       )
     ];
@@ -538,21 +538,16 @@ class _EventsViewState extends State<EventsView> {
     });
 
     try {
-      FunctionResponseModel ret =
-          await FunctionsService.searchEvents(_locationQuery);
-      if (ret.success) {
-        print(ret.entitieIds);
-        setState(() {
-          _filteredEvents = _events
-              ?.where((event) => ret.entitieIds.contains(event.id))
-              .toList();
-        });
-      } else {
+      //await FunctionsService.searchEvents(_locationQuery);
+      /* if (ret.success) { */
+      _filteredEvents = await FirestoreService().searchEvents(_locationQuery);
+      setState(() {});
+      /* } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('AppLocalizations.of(context)!.searchError'),
           backgroundColor: OVTheme.primaryRed,
         ));
-      }
+      } */
     } finally {
       if (mounted) setState(() => _isSearching = false);
     }

@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:vinho/model/lead_model.dart';
 import 'package:vinho/model/config_model.dart';
-import 'package:vinho/model/booking_model.dart';
+import 'package:vinho/model/event_model.dart';
+import 'package:vinho/model/lead_model.dart';
+import 'package:vinho/services/location.dart';
 
 class FirestoreService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  static final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   CollectionReference get events => _db.collection('events');
 
@@ -13,17 +13,16 @@ class FirestoreService {
 
   CollectionReference get config => _db.collection('config');
 
+  static CollectionReference get exceptions => _db.collection('exceptions');
+
   Stream<QuerySnapshot> getEventsStream(String lang) =>
-      events /* .where("lang", isEqualTo: lang) */
-          .where("status", isEqualTo: "A")
-          .orderBy('date')
-          .snapshots();
+      events.where("status", isEqualTo: "A").orderBy('date').snapshots();
 
   Future<DocumentSnapshot?> getEvent(String id) async {
     try {
       return await events.doc(id).get();
     } catch (e) {
-      print('Get event error: $e');
+      exceptionLog("Get event", {'id': id}, e);
       return null;
     }
   }
@@ -32,7 +31,6 @@ class FirestoreService {
     try {
       return await events.add(data);
     } catch (e) {
-      print('Add event error: $e');
       rethrow;
     }
   }
@@ -49,7 +47,7 @@ class FirestoreService {
               doc.data() as Map<String, dynamic>, doc.id))
           .toList();
     } catch (e) {
-      print('Get leads error: $e');
+      exceptionLog("Get leads", {'lang': lang}, e);
       return [];
     }
   }
@@ -59,7 +57,7 @@ class FirestoreService {
       // data['createdAt'] = FieldValue.serverTimestamp();
       return await leads.add(data);
     } catch (e) {
-      print('Add lead error: $e');
+      exceptionLog("Add lead", {}, e);
       rethrow;
     }
   }
@@ -76,7 +74,7 @@ class FirestoreService {
           .map((doc) => ConfigModel.fromFirestore(doc))
           .toList();
     } catch (e) {
-      print('Get configs error: $e');
+      exceptionLog("Get configs", {'lang': lang, 'key': key}, e);
       return [];
     }
   }
@@ -88,18 +86,64 @@ class FirestoreService {
       return privacy.firstWhere((config) => config.key == 'PRIVACY_POLICY',
           orElse: () => ConfigModel());
     } catch (e) {
-      print('Get privacy policy error: $e');
+      exceptionLog("Get privacy policy", {}, e);
       return null;
     }
   }
 
-  /* Future<DocumentReference> addBooking(String eventId, BookingModel booking) async {
+  Future<List<EventModel>> searchEvents(String loc) async {
     try {
-      await FirebaseAuth.instance.signInAnonymously();
-      return await events.doc(eventId).collection('bookings').add(booking.toJson());
-    } catch (e) {
-      print('Add booking error: $e');
-      rethrow;
+      final String location =
+          LocationSearchService.normalize(loc).toUpperCase();
+
+      if (location.trim().isNotEmpty) {
+        final snapshot = await events
+            .where("timestamp", isGreaterThanOrEqualTo: Timestamp.now())
+            .where("locationKeys", arrayContains: location)
+            .get();
+
+        final List<EventModel> ret = snapshot.docs
+            .map((doc) =>
+                EventModel.fromJson(doc.data() as Map<String, dynamic>))
+            .toList();
+
+        if (ret.isEmpty) {
+          logSearchResults(location.toUpperCase());
+        }
+
+        return ret;
+      } else {
+        return [];
+      }
+    } catch (err) {
+      exceptionLog("Failed to search query", {'loc': loc}, err);
+      return [];
     }
-  } */
+  }
+
+  void logSearchResults(String location) async {
+    final logActive = (await (config.doc('search_analytics').get())
+            as Map<String, dynamic>)['active'] as bool ||
+        false;
+
+    if (logActive) {
+      final searchLogsRef = _db.collection("searchLogs");
+
+      try {
+        final now = Timestamp.now();
+
+        searchLogsRef.doc(location).set({
+          'lastSearchTimestamp': now,
+          'count': FieldValue.increment(1),
+          'timestamps': FieldValue.arrayUnion([now])
+        }, SetOptions(merge: true));
+      } catch (err) {
+        exceptionLog("Failed to log search query", {'location': location}, err);
+      }
+    }
+  }
+
+  static void exceptionLog(String where, Map<String, String> params, dynamic err) {
+    exceptions.add({'where': where, 'params': params, 'err': err});
+  }
 }

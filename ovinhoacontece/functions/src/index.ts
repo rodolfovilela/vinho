@@ -1,9 +1,7 @@
-
-
 import * as admin from 'firebase-admin';
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 //import { Resend } from 'resend';
-import { Query, Timestamp } from 'firebase-admin/firestore';
+import { Timestamp } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions/logger';
 
 if (!admin.apps.length) {
@@ -11,7 +9,7 @@ if (!admin.apps.length) {
 }
 
 //const resend = new Resend('confirmation_token_here');
-
+/* 
 export const searchEvents = onCall(
   { region: "europe-west1" },
   async (request) => {
@@ -26,14 +24,11 @@ export const searchEvents = onCall(
         const eventsRef = db.collection("events");
         let q: Query = eventsRef
           .where("timestamp", ">=", admin.firestore.Timestamp.now())
-
-        /* q.where(Filter.or(Filter.where("district", "==", location),
-          Filter.where("municipality", "==", location))); */
-        q = q.where("locationKeys", "array-contains", location);
+          .where("locationKeys", "array-contains", location);
 
         const snapshot = await q.get();
 
-        const entities = snapshot.docs.map(doc => ({ id: doc.id/* , ...doc.data() */ }));
+        const entities = snapshot.docs.map(doc => ({ id: doc.id }));
 
         if (entities.length == 0) {
           logSearchResults(location.toUpperCase());
@@ -60,31 +55,17 @@ const logSearchResults = async (location: string) => {
     try {
       const now = Timestamp.now();
 
-      /*  const searchLogsSnapshot = await searchLogsRef.where("location", "==", location).get();
-       const now = Timestamp.now();
-   
-       if (searchLogsSnapshot.empty) {
-         searchLogsRef.add({
-           location: location,
-           lastSearchTimestamp: now,
-           count: 1,
-           timestamps: [now]
-         });
-       } else {
-         const doc = searchLogsSnapshot.docs[0]; */
-
       searchLogsRef.doc(location).set({
         lastSearchTimestamp: now,
         count: admin.firestore.FieldValue.increment(1),
         timestamps: admin.firestore.FieldValue.arrayUnion(now)
       }, { merge: true });
-      /*  } */
     } catch (err) {
       logger.error("Failed to log search query", { location, error: err });
     }
   }
 }
-
+ */
 export const bookSeats = onCall(
   { region: "europe-west1" },
   async (request) => {
@@ -266,7 +247,7 @@ class OvaException extends HttpsError {
   }
 }
  */
-
+/* 
 const normalize = (input: string) => {
   return (input ?? '')
     .toLowerCase()
@@ -282,4 +263,4 @@ const normalize = (input: string) => {
     .replace(/ô/gi, 'o')
     .replace(/ú/gi, 'u')
     .replace(/ç/gi, 'c');
-}
+} */

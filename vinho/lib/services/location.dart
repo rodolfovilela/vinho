@@ -77,7 +77,7 @@ class LocationSearchService {
   List<LocationResult> search(String query) {
     if (query.isEmpty) return [];
 
-    final q = _normalize(query);
+    final q = normalize(query);
 
     final results = <LocationResult>[];
 
@@ -89,7 +89,7 @@ class LocationSearchService {
       //final districtName = _formatDistrict(district);
 
       // 🔹 match distrito
-      if (_normalize(district).contains(q)) {
+      if (normalize(district).contains(q)) {
         results.add(LocationResult(
           label: district,
           districtCode: district,
@@ -99,7 +99,7 @@ class LocationSearchService {
 
       // 🔹 match municípios
       for (final m in municipalities) {
-        if (_normalize(m).contains(q)) {
+        if (normalize(m).contains(q)) {
           results.add(LocationResult(
             label: m,
             districtCode: district,
@@ -120,7 +120,7 @@ class LocationSearchService {
     return results.take(10).toList();
   }
 
-  String _normalize(String input) {
+  static String normalize(String input) {
     return input
         .toLowerCase()
         .replaceAll('á', 'a')
