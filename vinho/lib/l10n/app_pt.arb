@@ -63,5 +63,6 @@
   "confirmButton": "Confirmar reserva",
   "invalidCode": "Código inválido",
   "soldOut": "Evento esgotado",
-  "payAtTheEvent":"O pagamento deverá ser feito no evento"
+  "payAtTheEvent":"O pagamento deverá ser feito no evento",
+  "didYouMean":"Talvez quis dizer"
 }

@@ -107,7 +107,7 @@ class FirestoreService {
                 EventModel.fromJson(doc.data() as Map<String, dynamic>))
             .toList();
 
-        if (ret.isEmpty) {
+        if (ret.isEmpty && location.length >= 3) {
           logSearchResults(location.toUpperCase());
         }
 
@@ -122,28 +122,33 @@ class FirestoreService {
   }
 
   void logSearchResults(String location) async {
-    final logActive = (await (config.doc('search_analytics').get())
-            as Map<String, dynamic>)['active'] as bool ||
-        false;
+    try {
+      final logActive = (await (config.doc('search_analytics').get()))
+              .get('active') as bool ||
+          false;
 
-    if (logActive) {
-      final searchLogsRef = _db.collection("searchLogs");
+      if (logActive) {
+        final searchLogsRef = _db.collection("searchLogs");
 
-      try {
         final now = Timestamp.now();
+        final log = searchLogsRef.doc(location);
 
-        searchLogsRef.doc(location).set({
+        log.set({
           'lastSearchTimestamp': now,
           'count': FieldValue.increment(1),
-          'timestamps': FieldValue.arrayUnion([now])
+          //'timestamps': FieldValue.arrayUnion([now])
         }, SetOptions(merge: true));
-      } catch (err) {
-        exceptionLog("Failed to log search query", {'location': location}, err);
+
+        log.collection('timestamps').add({'timestamp': now});
       }
+    } catch (err) {
+      print("ERR:$err");
+      exceptionLog("Failed to log search query", {'location': location}, err);
     }
   }
 
-  static void exceptionLog(String where, Map<String, String> params, dynamic err) {
+  static void exceptionLog(
+      String where, Map<String, String> params, dynamic err) {
     exceptions.add({'where': where, 'params': params, 'err': err});
   }
 }

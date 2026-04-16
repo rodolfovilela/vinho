@@ -63,6 +63,7 @@
   "confirmButton": "Confirm booking",
   "invalidCode": "Invalid code",
   "soldOut": "Sold out",
-  "payAtTheEvent":"You’ll pay at the event"
+  "payAtTheEvent":"You’ll pay at the event",
+  "didYouMean":"Did you mean"
 }
 

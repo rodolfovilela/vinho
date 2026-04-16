@@ -199,18 +199,20 @@ class _HomeScreenState extends State<HomeScreen> {
           width: MediaQuery.of(context).size.width - 100,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [const AppLogo()],
+            children: [
+              IconButton(
+                icon: const Icon(Icons.menu),
+                iconSize: 28,
+                onPressed: () {
+                  context.push('/leads');
+                },
+              ),
+              const AppLogo()
+            ],
           ),
         ),
         actions: [
           AppLanguage(),
-          IconButton(
-            icon: const Icon(Icons.menu),
-            iconSize: 28,
-            onPressed: () {
-              context.push('/leads');
-            },
-          ),
         ],
       ),
       body: SafeArea(
@@ -222,16 +224,14 @@ class _HomeScreenState extends State<HomeScreen> {
           thickness: 3,
           child: SingleChildScrollView(
             controller: _scrollController,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    EventsView(),
-                  ],
-                ),  
-
-
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  EventsView(),
+                ],
+              ),
             ),
           ),
         ),

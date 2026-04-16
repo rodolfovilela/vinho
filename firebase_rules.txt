@@ -13,12 +13,27 @@ service cloud.firestore {
         allow update, delete: if false;
       }
       
-      match /searchLogs {
-        allow read	: if true;
+      match /searchLogs/{docId} {
+        allow read	: if false;
 
-        allow create: if true;
+        allow write: if request.resource.data.lastSearchTimestamp is timestamp &&
+    request.resource.data.count is int;
 
-        allow update, delete: if false;
+        allow delete: if false;
+      }
+      
+      
+      
+       match /searchLogs/{docId}/timestamps/{timestampId} {
+       allow create: if request.resource.data.keys().hasOnly(['timestamp']) &&
+                request.resource.data.timestamp is timestamp;
+      allow delete,read: if false;
+    }
+      
+      match /exceptions/{document=**} {
+        allow write: if true;
+
+        allow update, delete, read: if false;
       }
     
     match /{document=**} {

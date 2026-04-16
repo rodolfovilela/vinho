@@ -5,11 +5,15 @@ class LocationResult {
   final String districtCode;
   final LocationType type;
 
+  
+
   LocationResult({
     required this.label,
     required this.districtCode,
     required this.type,
   });
+
+  String get uniqueKey => label;
 /* 
   String get displayLabel {
     return type == LocationType.district

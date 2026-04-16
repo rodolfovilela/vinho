@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/* import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/model/function_response_model.dart';
@@ -50,6 +50,9 @@ class _QuickSearchViewState extends State<QuickSearchView> {
             child: Column(
               children: [
                 LocationAutocomplete(
+                  onSearch: () {
+                    
+                  },
                   onTextChanged:  (g){},
                     onClear: () {},
                //   controller: locationController,
@@ -144,3 +147,4 @@ class _QuickSearchViewState extends State<QuickSearchView> {
     }
   }
 }
+ */

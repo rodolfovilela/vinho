@@ -5,6 +5,7 @@ class LocationSearchService {
   LocationSearchService();
 
   static late Map<String, List<String>> locations;
+  static late List<LocationResult> locationsList;
   /*  static Future<Map<String, List<String>>> loadLocations() async {
     final doc = await FirebaseFirestore.instance
         .collection('config')
@@ -55,8 +56,20 @@ class LocationSearchService {
         .get();
 
     final data = doc.data() as Map<String, dynamic>;
+    locationsList = [];
 
     return data.map((key, value) {
+      locationsList.add(LocationResult(
+          label: formatDistrict(key),
+          districtCode: formatDistrict(key),
+          type: LocationType.district));
+
+      for (var mun in List<String>.from(value)) {
+        locationsList.add(LocationResult(
+            label: mun,
+            districtCode: formatDistrict(key),
+            type: LocationType.municipality));
+      }
       return MapEntry(
         formatDistrict(key),
         List<String>.from(value),
@@ -86,9 +99,6 @@ class LocationSearchService {
       final district = entry.key;
       final municipalities = entry.value;
 
-      //final districtName = _formatDistrict(district);
-
-      // 🔹 match distrito
       if (normalize(district).contains(q)) {
         results.add(LocationResult(
           label: district,
@@ -97,7 +107,6 @@ class LocationSearchService {
         ));
       }
 
-      // 🔹 match municípios
       for (final m in municipalities) {
         if (normalize(m).contains(q)) {
           results.add(LocationResult(
@@ -109,7 +118,6 @@ class LocationSearchService {
       }
     }
 
-    // 🔥 ordenar: municípios primeiro (melhor UX)
     results.sort((a, b) {
       if (a.type != b.type) {
         return a.type == LocationType.municipality ? -1 : 1;
@@ -118,6 +126,92 @@ class LocationSearchService {
     });
 
     return results.take(10).toList();
+  }
+
+  static List<LocationResult> getSuggestions(
+    String input,
+    /* 
+    List<LocationResult> allLocations, */
+  ) {
+    final query = normalize(input);
+
+    if (query.length < 3) return [];
+
+    final results = LocationSearchService.locationsList
+        .map((loc) {
+          final normalizedName = normalize(loc.label);
+
+          int score = 0;
+
+          if (normalizedName == query) {
+            score += 100;
+          }
+
+          if (normalizedName.startsWith(query)) {
+            score += 80;
+          }
+
+          if (normalizedName.contains(query)) {
+            score += 50;
+          }
+
+          final distance = levenshtein(normalizedName, query);
+          if (distance <= 2) {
+            score += (30 - distance * 10); // quanto menor a distância, melhor
+          }
+
+          return {
+            'location': loc,
+            'score': score,
+          };
+        })
+        .where((e) => e['score'] as int > 0)
+        .toList();
+
+    results.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+    
+    final seen = <String>{};
+    
+    return results
+        .where((r) {
+          final lr = r['location'] as LocationResult;
+          final key = lr.label;
+          
+          if (seen.contains(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .map((e) => e['location'] as LocationResult)
+        .take(3)
+        .toSet()
+        .toList();
+  }
+
+  static int levenshtein(String s, String t) {
+    final m = s.length;
+    final n = t.length;
+
+    List<List<int>> dp = List.generate(
+      m + 1,
+      (_) => List.generate(n + 1, (_) => 0),
+    );
+
+    for (int i = 0; i <= m; i++) dp[i][0] = i;
+    for (int j = 0; j <= n; j++) dp[0][j] = j;
+
+    for (int i = 1; i <= m; i++) {
+      for (int j = 1; j <= n; j++) {
+        if (s[i - 1] == t[j - 1]) {
+          dp[i][j] = dp[i - 1][j - 1];
+        } else {
+          dp[i][j] = 1 +
+              [dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]]
+                  .reduce((a, b) => a < b ? a : b);
+        }
+      }
+    }
+
+    return dp[m][n];
   }
 
   static String normalize(String input) {
