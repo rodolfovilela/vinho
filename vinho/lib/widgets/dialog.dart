@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:vinho/theme/ov_theme.dart';
 
 class OVDialog extends StatelessWidget {
-  OVDialog( {required this.isFullscreen,super.key, required this.content});
+  OVDialog(
+      {this.isFullscreen, this.closeable, super.key, required this.content});
   final Widget content;
   final ScrollController _scrollController = ScrollController();
-  bool isFullscreen = false;
+  bool? isFullscreen = false;
+  bool? closeable = true;
 
   @override
   Widget build(BuildContext context) {
@@ -18,22 +20,24 @@ class OVDialog extends StatelessWidget {
         backgroundColor: OVTheme.backgroundColor,
         surfaceTintColor: OVTheme.backgroundColor,
         insetPadding: EdgeInsets.zero,
-        title: Align(
-          alignment: Alignment.topRight,
-          child: GestureDetector(
-            child: const Icon(
-              Icons.cancel_outlined,
-              color: OVTheme.primaryRed,
-            ),
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ),
+        title: closeable ?? true
+            ? Align(
+                alignment: Alignment.topRight,
+                child: GestureDetector(
+                  child: const Icon(
+                    Icons.cancel_outlined,
+                    color: OVTheme.primaryRed,
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              )
+            : null,
         content: SizedBox(
             width: MediaQuery.of(context).size.width,
-            height:
-                MediaQuery.of(context).size.height * (isFullscreen ? 1 : 0.8),
+            height: MediaQuery.of(context).size.height *
+                ((isFullscreen ?? false) ? 1 : 0.8),
             child: Column(
               children: [
                 Expanded(

@@ -7,6 +7,7 @@ import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/model/event_model.dart';
 import 'package:vinho/theme/ov_theme.dart';
 import 'package:vinho/util/layout.dart';
+import 'package:vinho/widgets/sold_out.dart';
 
 class EventDetailView extends StatefulWidget {
   final EventModel event;
@@ -262,7 +263,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                                           ),
                                           SizedBox(width: 4),
                                           if (event.isSoldOut)
-                                            SoldOutWidget(context: context)
+                                            SoldOutWidget()
                                           else
                                             Flexible(
                                               child: Text(
@@ -473,32 +474,4 @@ class _EventDetailViewState extends State<EventDetailView> {
   }
 }
 
-class SoldOutWidget extends StatelessWidget {
-  const SoldOutWidget({
-    super.key,
-    required this.context,
-  });
 
-  final BuildContext context;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: OVTheme.muted,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        AppLocalizations.of(context)!.soldOut,
-        style: OVTheme.bodyBase.copyWith(
-          color: Colors.white,
-          letterSpacing: 1,
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-        ),
-        overflow: TextOverflow.ellipsis,
-      ),
-    );
-  }
-}

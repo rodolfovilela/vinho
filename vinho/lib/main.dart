@@ -195,21 +195,18 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
-        title: SizedBox(
-          width: MediaQuery.of(context).size.width - 100,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.menu),
-                iconSize: 28,
-                onPressed: () {
-                  context.push('/leads');
-                },
-              ),
-              const AppLogo()
-            ],
-          ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.menu),
+              iconSize: 28,
+              onPressed: () {
+                context.push('/leads');
+              },
+            ),
+            const AppLogo()
+          ],
         ),
         actions: [
           AppLanguage(),

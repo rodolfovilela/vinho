@@ -5,14 +5,14 @@ import 'package:vinho/services/location.dart';
 import 'package:vinho/theme/ov_theme.dart';
 
 class LocationAutocomplete extends StatefulWidget {
-  final Function(LocationResult) onSelected;
-  final Function() onSearch;
+  /*  final Function(LocationResult) onSelected; */
+  final Function(bool isSearchingSuggestion) onSearch;
   final Function() onClear;
   final Function(String) onTextChanged;
 
   const LocationAutocomplete(
       {super.key,
-      required this.onSelected,
+      /*  required this.onSelected, */
       required this.onSearch,
       required this.onClear,
       required this.onTextChanged});
@@ -30,7 +30,7 @@ class LocationAutocompleteState extends State<LocationAutocomplete> {
   bool _isFilled = false;
 
   late bool _isSearching;
-  late bool _isSearchingSuggestion;
+  // late bool isSearchingSuggestion;
 
   void clear({bool notify = false}) {
     _controller?.clear();
@@ -51,18 +51,18 @@ class LocationAutocompleteState extends State<LocationAutocomplete> {
   }
 
   void getSuggestions() {
-    if (!_isSearchingSuggestion) {
-      setState(() {
-        doGetSuggestions();
-      });
-    }
+    //if (!isSearchingSuggestion) {
+    setState(() {
+      doGetSuggestions();
+    });
+    //   }
   }
 
   @override
   void initState() {
     super.initState();
     _isSearching = false;
-    _isSearchingSuggestion = false;
+    // isSearchingSuggestion = false;
   }
 
   @override
@@ -91,7 +91,8 @@ class LocationAutocompleteState extends State<LocationAutocomplete> {
                 },
                 onSelected: (LocationResult value) {
                   _controller?.text = value.label;
-                  widget.onSelected(value);
+                  /* widget.onSelected(value); */
+                  widget.onSearch(true);
                 },
                 fieldViewBuilder: (context, controller, focusNode, onSubmit) {
                   _controller = controller;
@@ -191,36 +192,27 @@ class LocationAutocompleteState extends State<LocationAutocomplete> {
                     onPressed: _isSearching
                         ? null
                         : () {
-                            _isSearchingSuggestion = false;
-                            widget.onSearch();
+                            widget.onSearch(false);
                           },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: OVTheme.primaryRed,
                       foregroundColor: Colors.white,
-//                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(1),
                       ),
                       elevation: 4,
                     ),
-                    child: /* _isSearching
-                        ? SizedBox(
-                            height: 46,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white),
-                            ),
-                          )
-                        :  */
-                        Text(AppLocalizations.of(context)!.viewEvents,
-                            style: OVTheme.bodyBase
-                                .copyWith(color: Colors.white, fontSize: 14))),
+                    child: Text(AppLocalizations.of(context)!.viewEvents,
+                        style: OVTheme.bodyBase
+                            .copyWith(color: Colors.white, fontSize: 14))),
               ),
             )
           ],
         ),
-        if (locationSuggestions.isNotEmpty)
+        if (locationSuggestions.isNotEmpty &&
+            locationSuggestions
+                    .indexWhere((l) => l.label == _controller?.text) <
+                0)
           Padding(
             padding: const EdgeInsets.only(left: 12.0, top: 8),
             child: Row(
@@ -233,10 +225,8 @@ class LocationAutocompleteState extends State<LocationAutocomplete> {
                 ...locationSuggestions.map((s) => TextButton(
                       onPressed: () {
                         setLocation(s.label);
-                        widget.onSearch();
-                        setState(() {
-                          locationSuggestions = [];
-                        });
+                        widget.onSearch(true);
+                        resetSuggestions();
                       },
                       child: Text(
                         s.label,
@@ -255,6 +245,12 @@ class LocationAutocompleteState extends State<LocationAutocomplete> {
     );
   }
 
+  void resetSuggestions() {
+      setState(() {
+      locationSuggestions = [];
+    });
+  }
+
   void _onTextChanged() {
     widget.onTextChanged(_controller?.text ?? '');
   }
@@ -262,6 +258,5 @@ class LocationAutocompleteState extends State<LocationAutocomplete> {
   void doGetSuggestions() {
     locationSuggestions =
         LocationSearchService.getSuggestions(_controller!.text);
-    _isSearchingSuggestion = true;
   }
 }

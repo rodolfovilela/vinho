@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:jumping_dot/jumping_dot.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/model/booking_summary_model.dart';
 import 'package:vinho/model/function_response_model.dart';
 import 'package:vinho/services/functions_service.dart';
 import 'package:vinho/theme/ov_theme.dart';
+import 'package:vinho/widgets/dialog.dart';
 
 class BookingConfirmationView extends StatefulWidget {
   BookingSummaryModel bookingSummaryModel;
@@ -16,7 +18,7 @@ class BookingConfirmationView extends StatefulWidget {
 }
 
 class _BookingConfirmationViewState extends State<BookingConfirmationView> {
-  final _formKey = GlobalKey<FormState>();
+  //final _formKey = GlobalKey<FormState>();
   final _verificationCodeController = TextEditingController();
   bool _isSubmitting = false;
   final ScrollController _scrollController = ScrollController();
@@ -29,27 +31,62 @@ class _BookingConfirmationViewState extends State<BookingConfirmationView> {
 
   Future<void> _submitBooking() async {
     //if (_formKey.currentState!.validate()) {
-      setState(() => _isSubmitting = true);
-      try {
-          widget.bookingSummaryModel.booking.verificationCode =
-          _verificationCodeController.text;
-            if (widget.bookingSummaryModel.event.id != null) {
+    setState(() => _isSubmitting = true);
+
+    showDialog(
+      context: context,
+      barrierColor: OVTheme.semiTransparent,
+      builder: (context) => OVDialog(
+        isFullscreen: true,
+        closeable: false,
+        content: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(64.0),
+            child: Column(
+              children: [
+                Text(AppLocalizations.of(context)!.confirmingBooking),
+                Padding(
+                  padding: const EdgeInsets.only(top: 32.0),
+                  child: JumpingDots(
+                    color: OVTheme.muted,
+                    radius: 10,
+                    numberOfDots: 3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    try {
+      Future.delayed(const Duration(seconds: 4), () async {
+        widget.bookingSummaryModel.booking.verificationCode =
+            _verificationCodeController.text;
+        if (widget.bookingSummaryModel.event.id != null) {
           FunctionResponseModel ret = await FunctionsService.bookSeats(
-            widget.bookingSummaryModel.event.id!,
-            widget.bookingSummaryModel.booking);
+              widget.bookingSummaryModel.event.id!,
+              widget.bookingSummaryModel.booking);
           widget.bookingSummaryModel.response = ret;
         }
 
         if (mounted) {
+          Navigator.of(context).pop(); // fecha dialog
           context.go(
             '/',
             extra: widget.bookingSummaryModel,
           );
         }
-      } finally {
-        if (mounted) setState(() => _isSubmitting = false);
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
       }
-  //  }
+    }
+    //  }
   }
 
   @override
@@ -81,13 +118,21 @@ class _BookingConfirmationViewState extends State<BookingConfirmationView> {
                   child: Text(
                       AppLocalizations.of(context)!.confirmationCodeSentTo(
                           widget.bookingSummaryModel.booking.email),
-                      style:
-                          OVTheme.bodyBase.copyWith(fontWeight: FontWeight.w600, fontSize: 14)),
+                      style: OVTheme.bodyBase
+                          .copyWith(fontWeight: FontWeight.w600, fontSize: 14)),
                 ),
-                Text(AppLocalizations.of(context)!
-                    .bookingCodeConfirmationWarning),
+                Text(
+                    AppLocalizations.of(context)!
+                        .bookingCodeConfirmationWarning,
+                    style: OVTheme.bodyBase),
+                Padding(
+                  padding: const EdgeInsets.only(top: 32.0),
+                  child: Text(
+                      AppLocalizations.of(context)!.enterCodeToCompleteBooking,
+                      style: OVTheme.bodyBase.copyWith(color: OVTheme.muted)),
+                ),
                 Container(
-                  margin: const EdgeInsets.only(top: 32, bottom: 8),
+                  margin: const EdgeInsets.only(top: 16, bottom: 8),
                   child: TextFormField(
                     controller: _verificationCodeController,
                     decoration: InputDecoration(

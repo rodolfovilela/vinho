@@ -16,7 +16,7 @@
   "close": "Fechar",
   "noEventsForNow": "Nenhum evento por enquanto",
   "noEventsFoundByLocation": "{location} está sem eventos por agora",
-  "noEventsFoundByLocationSecondary":"Explora outras zonas ou verifica novamente em breve",
+  "noEventsFoundByLocationSecondary":"Explora outras zonas ou discobre os próximos eventos",
   "discoverEvents":"Explorar eventos",
   "sendEventSuggestion": "Tens uma ideia de evento? Partilha connosco em events@ovinhoacontece.com",
   "bePartOfIt":"Junta-te",
@@ -57,12 +57,15 @@
   "confirmYourEmail": "Confirme o seu email",
   "confirmationCodeSentTo":"Enviámos um código de confirmação para {email}",
   "bookingCodeConfirmationWarning": "A sua reserva foi registada, mas só será confirmada após a verificação do código enviado para o seu email.",
-  "checkSpamFolder": "Verifique a sua caixa de spam ou promoções caso não encontre o email.",
+  "checkSpamFolder": "Não recebeu o código? Veja na sua pasta de spam ou promoções.",
   "confirmationCode":"Código de confirmação",
-  "enterDigitsCode":"Introduza o código de 4 dígitos",
   "confirmButton": "Confirmar reserva",
   "invalidCode": "Código inválido",
   "soldOut": "Evento esgotado",
   "payAtTheEvent":"O pagamento deverá ser feito no evento",
-  "didYouMean":"Talvez quis dizer"
+  "didYouMean":"Talvez quis dizer",
+  "enterCodeToCompleteBooking": "Introduza o código de 4 dígitos para concluir a sua reserva.",
+  "confirmingBooking": "A garantir o seu lugar…",
+  "bookingSuccessMessage": "O seu lugar está garantido. Enviámos os detalhes para o seu email.",
+  "bookingErrorMessage": "Não foi possível concluir a sua reserva. Tente novamente."
 }

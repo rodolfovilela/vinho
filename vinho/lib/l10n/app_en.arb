@@ -17,7 +17,7 @@
   "close": "Close",
   "noEventsForNow": "No events for now",
   "noEventsFoundByLocation": "No events in {location} yet",
-  "noEventsFoundByLocationSecondary":"Try another location or check back later",
+  "noEventsFoundByLocationSecondary":"Try another location or explore upcoming events",
   "discoverEvents":"Discover events",
   "sendEventSuggestion": "Got an event idea? Share it with us at events@ovinhoacontece.com",
   "hostedBy": "Hosted by",
@@ -57,13 +57,16 @@
   "confirmYourEmail": "Verify your email",
   "confirmationCodeSentTo":"We sent a confirmation code to {email}",
   "bookingCodeConfirmationWarning": "Your booking has been submitted and will only be confirmed after you enter the verification code sent to your email.",
-  "checkSpamFolder": "Check your spam or promotions folder.",
+  "checkSpamFolder": "Didn’t receive the code? Check your spam folder.",
   "confirmationCode":"Confirmation code",
-  "enterDigitsCode":"Enter the 4-digit code",
   "confirmButton": "Confirm booking",
   "invalidCode": "Invalid code",
   "soldOut": "Sold out",
   "payAtTheEvent":"You’ll pay at the event",
-  "didYouMean":"Did you mean"
+  "didYouMean":"Did you mean",
+  "enterCodeToCompleteBooking":"Enter the 4-digit code to complete your booking.",
+  "confirmingBooking":"Securing your spot…",
+  "bookingSuccessMessage":"Your spot is secured. We’ve sent the details to your email.",
+  "bookingErrorMessage":"We couldn’t complete your booking. Please try again."
 }
 
