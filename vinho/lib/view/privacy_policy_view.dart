@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/l10n_helper/l10n_helper.dart';
 import 'package:vinho/services/firestore_service.dart';
 import 'package:vinho/theme/ov_theme.dart';
@@ -76,16 +77,16 @@ class _PrivacyPolicyViewState extends State<PrivacyPolicyView> {
                     ),
                   )
                 : RawScrollbar(
+                  controller: _scrollController,
+                  thumbVisibility: true,
+                  trackVisibility: true,
+                  thumbColor: OVTheme.primaryRed,
+                  thickness: 3,
+                  child: SingleChildScrollView(
                     controller: _scrollController,
-                    thumbVisibility: true,
-                    trackVisibility: true,
-                    //  radius: Radius.circular(8),
-                    thumbColor: OVTheme.primaryRed,
-                    thickness: 3,
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.only(
-                          left: 16, right: 16, bottom: 24),
-                      child: HtmlWidget(
+                    padding:
+                          const EdgeInsets.only(left: 16, right: 16, bottom: 24),
+                    child: HtmlWidget(
                         _privacyContent!,
                         textStyle: OVTheme.bodyBase.copyWith(
                           color: OVTheme.muted,
@@ -93,8 +94,8 @@ class _PrivacyPolicyViewState extends State<PrivacyPolicyView> {
                         ),
                         buildAsync: false,
                       ),
-                    ),
                   ),
+                ),
       ),
     );
   }

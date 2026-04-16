@@ -97,6 +97,7 @@ class _BookingViewState extends State<BookingView> {
                 controller: _scrollController,
                 child: Container(
                   height: MediaQuery.of(context).size.height - kToolbarHeight,
+                  margin:  EdgeInsets.only(bottom: 60),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                   child: bookingForm(),
@@ -104,56 +105,59 @@ class _BookingViewState extends State<BookingView> {
               ),
             ),
             Positioned(
-              bottom: 4,
+              bottom: 8,
               left: 16,
               right: 16,
               child: SafeArea(
-                child: Column(
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!
-                          .onlySeatsLeft(widget.event.availableSeats),
-                      style: OVTheme.bodyBase.copyWith(
-                        color: OVTheme.muted,
-                        fontSize: 11,
+                child: Container(
+                  color: OVTheme.backgroundColor,
+                  child: Column(
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!
+                            .onlySeatsLeft(widget.event.availableSeats),
+                        style: OVTheme.bodyBase.copyWith(
+                          color: OVTheme.muted,
+                          fontSize: 11,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 8),
-                      width: double.infinity,
-                      child: ElevatedButton(
-                          onPressed: _isSubmitting ||
-                                  (_formKey.currentState == null ||
-                                      !_formKey.currentState!.validate())
-                              ? null
-                              : _submitBooking,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: OVTheme.primaryRed,
-                            foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(1),
+                      Container(
+                        margin: const EdgeInsets.only(top: 8),
+                        width: double.infinity,
+                        child: ElevatedButton(
+                            onPressed: _isSubmitting ||
+                                    (_formKey.currentState == null ||
+                                        !_formKey.currentState!.validate())
+                                ? null
+                                : _submitBooking,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: OVTheme.primaryRed,
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(1),
+                              ),
+                              elevation: 4,
                             ),
-                            elevation: 4,
-                          ),
-                          child: _isSubmitting
-                              ? SizedBox(
-                                  height: 16,
-                                  width: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white),
-                                  ),
-                                )
-                              : Text(AppLocalizations.of(context)!.bookNow,
-                                  style: OVTheme.bodyBase.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500))),
-                    ),
-                  ],
+                            child: _isSubmitting
+                                ? SizedBox(
+                                    height: 16,
+                                    width: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.white),
+                                    ),
+                                  )
+                                : Text(AppLocalizations.of(context)!.bookNow,
+                                    style: OVTheme.bodyBase.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500))),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -165,217 +169,220 @@ class _BookingViewState extends State<BookingView> {
 
   Widget bookingForm() {
     return Form(
-      key: _formKey,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      onChanged: () => setState(() {
-        
-      }),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Column(
-              children: [
-                Row(
-                  //  mainAxisAlignment: MainAxisAlignment.center,
+        key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        onChanged: () => setState(() {}),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Column(
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      //  mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 60.0),
-                          child: Text(
-                            AppLocalizations.of(context)!.numberOfGuests,
-                            style: OVTheme.bodyBase.copyWith(
-                              color: OVTheme.blackRetro,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                        if (widget.event.hasMaxSeatsPerBooking &&
-                            widget.event.maxSeatsPerBooking != null)
-                          Text(
-                            AppLocalizations.of(context)!.maxSeatsPerBooking(
-                                widget.event.maxSeatsPerBooking!),
-                            style: OVTheme.bodyBase.copyWith(
-                              color: OVTheme.muted,
-                              fontSize: 11,
-                            ),
-                          ),
-                      ],
-                    ),
-                    if (_paxCount > 1)
-                      IconButton(
-                        onPressed: () => setState(() => _paxCount--),
-                        icon: Icon(Icons.remove, color: OVTheme.muted),
-                      ),
-                    if (_paxCount == 1) SizedBox(width: 40),
-                    Container(
-                      width: 60,
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.symmetric(vertical: 4),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: OVTheme.blackRetro),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        '$_paxCount',
-                        style: OVTheme.bodyBase.copyWith(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: OVTheme.blackRetro,
-                        ),
-                      ),
-                    ),
-                    if (hasMoreButton())
-                      IconButton(
-                        onPressed: () => setState(() => _paxCount++),
-                        icon: Icon(Icons.add, color: OVTheme.primaryRed),
-                      ),
-                    if (!hasMoreButton()) SizedBox(width: 40),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          TextFormField(
-            controller: _nameController,
-            decoration: InputDecoration(
-              //hintText: "hinttext",
-              labelText: AppLocalizations.of(context)!.fullName,
-            ),
-
-            /*  decoration: OVTheme.inputDecorationTheme.copyWith(
-              labelText: AppLocalizations.of(context)!.fullName,
-            ), */
-            cursorColor: OVTheme.blackRetro,
-            validator: (value) => value == null || value.isEmpty
-                ? AppLocalizations.of(context)!.nameRequired
-                : null,
-          ),
-          SizedBox(height: 16),
-          TextFormField(
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.email,
-            ),
-            cursorColor: OVTheme.blackRetro,
-            validator: (value) => value == null || !value.contains('@')
-                ? AppLocalizations.of(context)!.validEmailRequired
-                : null,
-          ),
-          SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                flex: 1,
-                child: SizedBox(
-                  height: 68,
-                  child: TextFormField(
-                    controller: _countryCodeController,
-                    decoration: InputDecoration(
-                      labelText:
-                          AppLocalizations.of(context)!.countryCallingCode,
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          _countryCodeController.text = '+351';
-                          if (mounted) setState(() {});
-                        });
-                        return null;
-                      } else if (!RegExp(r'^\+[1-9]\d{1,3}$').hasMatch(value)) {
-                        return AppLocalizations.of(context)!.invalidCallingCode;
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                flex: 3,
-                child: SizedBox(
-                  height: 68,
-                  child: TextFormField(
-                    controller: _phoneController,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.phoneNumber,
-                      border: OutlineInputBorder(),
-                    ),
-                    cursorColor: OVTheme.blackRetro,
-                    validator: (value) => value == null || value.isEmpty
-                        ? AppLocalizations.of(context)!.phoneRequired
-                        : null,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppLocalizations.of(context)!.privacyPolicyDisclaimer,
-                style: OVTheme.bodyBase.copyWith(
-                  color: OVTheme.muted,
-                  fontSize: 11,
-                ),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Checkbox(
-                    value: _privacyConsent,
-                    onChanged: (value) {
-                      setState(() {
-                        _privacyConsent = value ?? false;
-                      });
-                    },
-                    activeColor: OVTheme.primaryRed,
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PrivacyPolicyView(),
-                        ),
-                      ),
-                      child: RichText(
-                        text: TextSpan(
-                          style: OVTheme.bodyBase
-                              .copyWith(fontSize: 14, color: OVTheme.muted),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TextSpan(
-                                text:
-                                    '${AppLocalizations.of(context)!.iHaveReadAndAccept} '),
-                            TextSpan(
-                              text: AppLocalizations.of(context)!.privacyPolicy,
-                              style: TextStyle(
-                                  color: OVTheme.primaryRed,
-                                  decoration: TextDecoration.underline,
-                                  fontSize: 14),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 60.0),
+                              child: Text(
+                                AppLocalizations.of(context)!.numberOfGuests,
+                                style: OVTheme.bodyBase.copyWith(
+                                  color: OVTheme.blackRetro,
+                                  fontSize: 14,
+                                ),
+                              ),
                             ),
-                            const TextSpan(text: '.'),
+                            if (widget.event.hasMaxSeatsPerBooking &&
+                                widget.event.maxSeatsPerBooking != null)
+                              Text(
+                                AppLocalizations.of(context)!
+                                    .maxSeatsPerBooking(
+                                        widget.event.maxSeatsPerBooking!),
+                                style: OVTheme.bodyBase.copyWith(
+                                  color: OVTheme.muted,
+                                  fontSize: 11,
+                                ),
+                              ),
                           ],
                         ),
+                        if (_paxCount > 1)
+                          IconButton(
+                            onPressed: () => setState(() => _paxCount--),
+                            icon: Icon(Icons.remove, color: OVTheme.muted),
+                          ),
+                        if (_paxCount == 1) SizedBox(width: 40),
+                        Container(
+                          width: 60,
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.symmetric(vertical: 4),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: OVTheme.blackRetro),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            '$_paxCount',
+                            style: OVTheme.bodyBase.copyWith(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: OVTheme.blackRetro,
+                            ),
+                          ),
+                        ),
+                        if (hasMoreButton())
+                          IconButton(
+                            onPressed: () => setState(() => _paxCount++),
+                            icon: Icon(Icons.add, color: OVTheme.primaryRed),
+                          ),
+                        if (!hasMoreButton()) SizedBox(width: 40),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  //hintText: "hinttext",
+                  labelText: AppLocalizations.of(context)!.fullName,
+                ),
+
+                /*  decoration: OVTheme.inputDecorationTheme.copyWith(
+              labelText: AppLocalizations.of(context)!.fullName,
+            ), */
+                cursorColor: OVTheme.blackRetro,
+                validator: (value) => value == null || value.isEmpty
+                    ? AppLocalizations.of(context)!.nameRequired
+                    : null,
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.email,
+                ),
+                cursorColor: OVTheme.blackRetro,
+                validator: (value) => value == null || !value.contains('@')
+                    ? AppLocalizations.of(context)!.validEmailRequired
+                    : null,
+              ),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: SizedBox(
+                      height: 68,
+                      child: TextFormField(
+                        controller: _countryCodeController,
+                        decoration: InputDecoration(
+                          labelText:
+                              AppLocalizations.of(context)!.countryCallingCode,
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              _countryCodeController.text = '+351';
+                              if (mounted) setState(() {});
+                            });
+                            return null;
+                          } else if (!RegExp(r'^\+[1-9]\d{1,3}$')
+                              .hasMatch(value)) {
+                            return AppLocalizations.of(context)!
+                                .invalidCallingCode;
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    flex: 3,
+                    child: SizedBox(
+                      height: 68,
+                      child: TextFormField(
+                        controller: _phoneController,
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.phoneNumber,
+                          border: OutlineInputBorder(),
+                        ),
+                        cursorColor: OVTheme.blackRetro,
+                        validator: (value) => value == null || value.isEmpty
+                            ? AppLocalizations.of(context)!.phoneRequired
+                            : null,
                       ),
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: 24),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.privacyPolicyDisclaimer,
+                    style: OVTheme.bodyBase.copyWith(
+                      color: OVTheme.muted,
+                      fontSize: 11,
+                    ),
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Checkbox(
+                        value: _privacyConsent,
+                        onChanged: (value) {
+                          setState(() {
+                            _privacyConsent = value ?? false;
+                          });
+                        },
+                        activeColor: OVTheme.primaryRed,
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const PrivacyPolicyView(),
+                            ),
+                          ),
+                          child: RichText(
+                            text: TextSpan(
+                              style: OVTheme.bodyBase
+                                  .copyWith(fontSize: 14, color: OVTheme.muted),
+                              children: [
+                                TextSpan(
+                                    text:
+                                        '${AppLocalizations.of(context)!.iHaveReadAndAccept} '),
+                                TextSpan(
+                                  text: AppLocalizations.of(context)!
+                                      .privacyPolicy,
+                                  style: TextStyle(
+                                      color: OVTheme.primaryRed,
+                                      decoration: TextDecoration.underline,
+                                      fontSize: 14),
+                                ),
+                                const TextSpan(text: '.'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 
   bool hasMoreButton() {
