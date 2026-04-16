@@ -5,9 +5,14 @@ import 'package:vinho/theme/ov_theme.dart';
 
 class OVDialog extends StatelessWidget {
   OVDialog(
-      {this.isFullscreen, this.closeable, super.key, required this.content});
+      {this.isFullscreen,
+      this.closeable,
+      this.onClose,
+      super.key,
+      required this.content});
   final Widget content;
   final ScrollController _scrollController = ScrollController();
+  final Function()? onClose;
   bool? isFullscreen = false;
   bool? closeable = true;
 
@@ -29,6 +34,9 @@ class OVDialog extends StatelessWidget {
                     color: OVTheme.primaryRed,
                   ),
                   onTap: () {
+                    if (onClose != null) {
+                      onClose!();
+                    }
                     Navigator.of(context).pop();
                   },
                 ),

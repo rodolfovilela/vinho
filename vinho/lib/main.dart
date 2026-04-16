@@ -1,13 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:jumping_dot/jumping_dot.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:vinho/generated/l10n/app_localizations.dart';
 import 'package:vinho/l10n_helper/l10n_helper.dart';
-import 'package:vinho/model/booking_model.dart';
 import 'package:vinho/model/booking_summary_model.dart';
 import 'package:vinho/model/event_model.dart';
-import 'package:vinho/model/function_response_model.dart';
 import 'package:vinho/services/auth_service.dart';
 import 'package:vinho/services/location.dart';
 import 'package:vinho/theme/ov_theme.dart';
@@ -30,6 +29,15 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  runApp(const AppInitializer());
+}
+
+void mains() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   // Uncomment to seed mock events (run once)
   // await SeedService.seedEvents();
 
@@ -40,6 +48,48 @@ void main() async {
         await LocationSearchService.loadLocations();
     runApp(const MyApp());
   });
+}
+
+class AppInitializer extends StatefulWidget {
+  const AppInitializer({super.key});
+
+  @override
+  State<AppInitializer> createState() => _AppInitializerState();
+}
+
+class _AppInitializerState extends State<AppInitializer> {
+  bool _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    await AuthService.ensureAuth();
+    LocationSearchService.locations =
+        await LocationSearchService.loadLocations();
+
+    if (mounted) {
+      setState(() => _ready = true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_ready) {
+      return Center(
+        child: JumpingDots(
+          color: OVTheme.muted,
+          radius: 10,
+          numberOfDots: 3,
+        ),
+      );
+    }
+
+    return const MyApp();
+  }
 }
 
 final GoRouter _router = GoRouter(
@@ -105,46 +155,57 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final ScrollController _scrollController;
+  BookingSummaryModel? _bookingSummary;
+
+  bool _dialogShown = false;
+
+@override
+  void didUpdateWidget(covariant HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.bookingSummary != widget.bookingSummary) {
+      _bookingSummary = widget.bookingSummary;
+      _tryShowDialog();
+    }
+  }
+
+
+void _showDialog() {
+  if (_dialogShown || _bookingSummary == null || !context.mounted) return;
+  _dialogShown = true;
+
+  showDialog(
+    context: context,
+    barrierColor: OVTheme.semiTransparent,
+    builder: (context) => OVDialog(
+      isFullscreen: false,
+      content: BookingCallbackView(_bookingSummary!),
+      onClose: () {
+        setState(() {
+          _bookingSummary = null;
+          _dialogShown = false;
+        });
+      },
+    ),
+  );
+}
+
+  void _tryShowDialog() {
+    if (_dialogShown) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showDialog();
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-
+    _bookingSummary = widget.bookingSummary;
     _scrollController = ScrollController();
-    /* BookingSummaryModel bookingSummary = BookingSummaryModel(
-        booking: BookingModel(
-            eventId: 'eventId',
-            seats: 2,
-            name: 'name',
-            email: ' email',
-            phone: ' phone'),
-        event: EventModel(
-            id: 'eventId',
-            title: 'Event Title',
-            date: '2024-12-31',
-            time: '20:00',
-            address: 'Event Address',
-            deadlineForMinimumPax: DateTime.now(),
-            minimumPaxRequired: 10,
-            location: 'Event Location'),
-        response: FunctionResponseModel(
-            success: true, messageKey: 'booking-submitted'));
 
-    
-    if (/* widget. */ bookingSummary != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          showDialog(
-            context: context,
-            barrierColor: OVTheme.semiTransparent,
-            builder: (context) => OVDialog(
-              isFullscreen: false,
-              content: BookingCallbackView(/* widget. */ bookingSummary!),
-            ),
-          );
-        }
-      });
-    } */
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _tryShowDialog();
+    });
   }
 
   @override
@@ -155,39 +216,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    BookingSummaryModel bookingSummary = BookingSummaryModel(
-        booking: BookingModel(
-            eventId: 'eventId',
-            seats: 2,
-            name: 'name',
-            email: ' email',
-            phone: ' phone'),
-        event: EventModel(
-            id: 'eventId',
-            title: 'Event Title',
-            date: '2024-12-31',
-            time: '20:00',
-            address: 'Event Address',
-            deadlineForMinimumPax: DateTime.now(),
-            minimumPaxRequired: 10,
-            location: 'Event Location'),
-        response: FunctionResponseModel(
-            success: true, messageKey: 'booking-submitted'));
-
-    if (widget.bookingSummary != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          showDialog(
-            context: context,
-            barrierColor: OVTheme.semiTransparent,
-            builder: (context) => OVDialog(
-              isFullscreen: false,
-              content: BookingCallbackView(/*  */ widget.bookingSummary!),
-            ),
-          );
-        }
-      });
-    }
     return Scaffold(
       backgroundColor: OVTheme.backgroundColor,
       appBar: AppBar(
@@ -246,12 +274,27 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Locale? locale;
+  late Future<Locale> _localeFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _localeFuture = _getDeviceLocale();
+  }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Locale>(
-      future: _getDeviceLocale(),
+      future: _localeFuture,
       builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(
+              child: JumpingDots(
+            color: OVTheme.muted,
+            radius: 10,
+            numberOfDots: 3,
+          ));
+        }
         final deviceLocale = snapshot.data ?? const Locale('pt');
         return L10nHelper(
           currentLocaleCallback: () => locale ?? deviceLocale,
