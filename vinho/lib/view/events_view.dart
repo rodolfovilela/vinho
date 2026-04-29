@@ -48,7 +48,7 @@ class _EventsViewState extends State<EventsView> {
                 .map((doc) => EventModel.fromFirestore(doc))
                 .toList();
 
-            _filteredEvents = _events;
+//            _filteredEvents = _events;
           });
         }
       });
@@ -137,7 +137,11 @@ class _EventsViewState extends State<EventsView> {
             ),
           ),
         ), */
-      if (_showEvents && _filteredEvents != null && _filteredEvents!.isEmpty)
+
+      if (_showEvents &&
+          !eventsNotFound() &&
+          _filteredEvents != null &&
+          _filteredEvents!.isEmpty)
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(
@@ -214,9 +218,48 @@ class _EventsViewState extends State<EventsView> {
                   child: buildEventCard(event),
                 ),
               ),
-            ))
+            )),
+      if (_showEvents && eventsNotFound())
+      Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(
+            vertical: 24.0,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Icon(
+                Icons.wine_bar_outlined,
+                size: 48,
+                color: Colors.grey.withOpacity(0.5),
+              ),
+              const SizedBox(height: 12),
+              FittedBox(
+                child: Text(
+                  AppLocalizations.of(context)!
+                      .noEventsForNow,
+                  style: OVTheme.bodyBase.copyWith(
+                    color: OVTheme.muted,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              
+              const SizedBox(height: 48),
+              FittedBox(
+                child: Text(
+                  AppLocalizations.of(context)!.sendEventSuggestion,
+                  style: OVTheme.bodyBase,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
     ];
   }
+
+  bool eventsNotFound() => (_events == null || _events!.isEmpty);
 
   Widget buildEventCard(EventModel event) {
     return Column(

@@ -15,8 +15,11 @@ class FirestoreService {
 
   static CollectionReference get exceptions => _db.collection('exceptions');
 
-  Stream<QuerySnapshot> getEventsStream(String lang) =>
-      events.where("status", isEqualTo: "A").orderBy('date').snapshots();
+  Stream<QuerySnapshot> getEventsStream(String lang) => events
+      .where("status", isEqualTo: "A")
+      .where("timestamp", isGreaterThanOrEqualTo: Timestamp.now())
+      .orderBy('date')
+      .snapshots();
 
   Future<DocumentSnapshot?> getEvent(String id) async {
     try {
