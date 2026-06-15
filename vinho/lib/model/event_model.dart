@@ -132,4 +132,15 @@ class EventModel {
   bool get hasMaxSeatsPerBooking => maxSeatsPerBooking != null;
   bool get hasMinimumPaxRequired => minimumPaxRequired != null;
   bool get hasDeadlineForMinimumPax => deadlineForMinimumPax != null;
+  String get formattedLocation {
+    if (location == null || location!.isEmpty) return '';
+    final loc = location!;
+    if (municipality != null && municipality!.isNotEmpty) {
+      return '$loc (${municipality})';
+    } else if (district != null && district!.isNotEmpty) {
+      return '$loc (${district})';
+    } else {
+      return loc;
+    }
+  }
 }

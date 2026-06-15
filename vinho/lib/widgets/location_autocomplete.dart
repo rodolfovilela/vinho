@@ -25,7 +25,7 @@ class LocationAutocompleteState extends State<LocationAutocomplete> {
   final LocationSearchService _service = LocationSearchService();
   List<LocationResult> locationSuggestions = [];
 
-  TextEditingController? _controller;
+  TextEditingController _controller = TextEditingController();
 
   bool _isFilled = false;
 
@@ -63,6 +63,7 @@ class LocationAutocompleteState extends State<LocationAutocomplete> {
     super.initState();
     _isSearching = false;
     // isSearchingSuggestion = false;
+    _controller.addListener(_onTextChanged);
   }
 
   @override
@@ -79,9 +80,9 @@ class LocationAutocompleteState extends State<LocationAutocomplete> {
               child: Autocomplete<LocationResult>(
                 displayStringForOption: (option) => option.label,
                 optionsBuilder: (TextEditingValue value) {
-                  setState(() {
+                   setState(() {
                     _isFilled = value.text.isNotEmpty;
-                  });
+                  }); 
 
                   if (value.text.isEmpty) {
                     return const Iterable<LocationResult>.empty();
@@ -97,8 +98,8 @@ class LocationAutocompleteState extends State<LocationAutocomplete> {
                 fieldViewBuilder: (context, controller, focusNode, onSubmit) {
                   _controller = controller;
 
-                  controller.removeListener(_onTextChanged);
-                  controller.addListener(_onTextChanged);
+                  /* controller.removeListener(_onTextChanged);
+                  controller.addListener(_onTextChanged); */
 
                   return TextField(
                     controller: controller,
@@ -138,7 +139,7 @@ class LocationAutocompleteState extends State<LocationAutocomplete> {
                       elevation: 4,
                       color: Colors.white,
                       child: Container(
-                        width: MediaQuery.of(context).size.width * 0.7,
+                        width: 300/* MediaQuery.of(context).size.width * 0.7 */,
                         constraints: BoxConstraints(
                           maxHeight: MediaQuery.of(context).size.height * 0.6,
                           minHeight: 100,
@@ -246,17 +247,19 @@ class LocationAutocompleteState extends State<LocationAutocomplete> {
   }
 
   void resetSuggestions() {
-      setState(() {
+    setState(() {
       locationSuggestions = [];
     });
   }
 
   void _onTextChanged() {
     widget.onTextChanged(_controller?.text ?? '');
+    _isFilled = _controller?.text.isNotEmpty ?? false;
   }
 
   void doGetSuggestions() {
     locationSuggestions =
-        LocationSearchService.getSuggestions(_controller!.text);
+        LocationSearchService.getSuggestions(_controller.text);
+    setState(() {});
   }
 }

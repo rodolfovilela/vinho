@@ -241,24 +241,9 @@ void _showDialog() {
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-            controller: _scrollController,
-            child: RawScrollbar(
-              controller: _scrollController,
-              thumbVisibility: true,
-              trackVisibility: true,
-              thumbColor: OVTheme.primaryRed,
-              thickness: 3,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  EventsView(),
-                ],
-              ),
-            ),
-          ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: EventsView(),
         ),
       ),
     );

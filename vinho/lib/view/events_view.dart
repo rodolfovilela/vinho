@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jumping_dot/jumping_dot.dart';
@@ -19,254 +20,188 @@ class EventsView extends StatefulWidget {
 }
 
 class _EventsViewState extends State<EventsView> {
-  final GlobalKey<LocationAutocompleteState> locationKey =
-      GlobalKey<LocationAutocompleteState>();
-  final ScrollController _scrollController = ScrollController();
-  List<EventModel>? _events/* , _filteredEvents */;
-  late final FirestoreService _firestoreService;
-  late bool _isSearching;
-  late bool _isSearchingSuggestion;
-  late bool _showEvents;
-  String _locationQuery = '';
-  StreamSubscription<dynamic>? _eventsSubscription;
+  final ScrollController _controller = ScrollController();
+  final FirestoreService _service = FirestoreService();
+
+  final List<EventModel> _events = [];
+
+  DocumentSnapshot? lastDoc;
+
+  bool loading = false;
+  bool hasMore = true;
+  bool isSearchMode = false;
+
+  String locationQuery = '';
 
   @override
   void initState() {
     super.initState();
-    _isSearching = false;
-    _isSearchingSuggestion = false;
-    _showEvents = true;
-    _firestoreService = FirestoreService();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _eventsSubscription = _firestoreService
-          .getEventsStream(Localizations.localeOf(context).languageCode)
-          .listen((snapshot) {
-        if (mounted) {
-          setState(() {
-            _events = snapshot.docs
-                .map((doc) => EventModel.fromFirestore(doc))
-                .toList();
-
-//            _filteredEvents = _events;
-          });
-        }
-      });
-    });
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+    _controller.addListener(_onScroll);
+    _loadMore();
   }
 
   @override
   void dispose() {
-    _eventsSubscription?.cancel();
-    _scrollController.dispose();
+    _controller.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_controller.hasClients) return;
+    if (loading || !hasMore || isSearchMode) return;
+
+   // if (_controller.position.extentAfter < 300) {
+      _loadMore();
+    //}
+  }
+
+  Future<void> _loadMore() async {
+    if (loading || !hasMore || isSearchMode) return;
+
+    setState(() => loading = true);
+
+    final snap = await _service.getMoreEvents(lastDoc);
+
+    if (!mounted) return;
+
+    if (snap.docs.isEmpty) {
+      hasMore = false;
+    } else {
+      lastDoc = snap.docs.last;
+      _events.addAll(
+        snap.docs.map((d) => EventModel.fromFirestore(d)),
+      );
+    }
+
+    setState(() => loading = false);
+  }
+
+  void _resetSearch() {
+    setState(() {
+      _events.clear();
+      lastDoc = null;
+      hasMore = true;
+      isSearchMode = false;
+      locationQuery = '';
+    });
+
+    _loadMore();
+  }
+
+  Future<void> _search(String query) async {
+    setState(() {
+      isSearchMode = true;
+      loading = true;
+      _events.clear();
+      hasMore = false;
+      locationQuery = query;
+    });
+
+    final result = await _service.searchEvents(query);
+
+    if (!mounted) return;
+
+    setState(() {
+      _events.addAll(result);
+      loading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isWide = MediaQuery.of(context).size.width > 600;
-    return RawScrollbar(
-      controller: _scrollController,
-      thumbVisibility: true,
-      trackVisibility: true,
-      //  radius: Radius.circular(8),
-      thumbColor: OVTheme.primaryRed,
-      thickness: 3,
-      child: SingleChildScrollView(
-        controller: _scrollController,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: searchPainelWidget(isWide),
-            ),
-            if (_locationQuery.isEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 24.0),
-                child: Text(
-                  AppLocalizations.of(context)!.upcomingEvents,
-                  style: OVTheme.bodyBase.copyWith(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                    letterSpacing: 1.1,
-                    wordSpacing: 2,
-                  ),
-                ),
-              ),
-            if (_isSearching)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(64.0),
-                  child: JumpingDots(
-                    color: OVTheme.muted,
-                    radius: 10,
-                    numberOfDots: 3,
-                  ),
-                ),
-              ),
-            if (!_isSearching) ...buildEvents()
-          ],
-        ),
-      ),
-    );
-  }
-
-  List<Widget> buildEvents() {
-    return [
-      /* 
-      ... search context ...
-      if (_showEvents && _locationQuery.isNotEmpty &&
-          (_filteredEvents != null && _filteredEvents!.isNotEmpty))
-        Padding(
-          padding: const EdgeInsets.only(top: 24.0),
-          child: Text(
-            _locationQuery,
-            style: OVTheme.bodyBase.copyWith(
-              fontWeight: FontWeight.w600,
-              fontSize: 16,
-              letterSpacing: 1.1,
-              wordSpacing: 2,
-            ),
-          ),
-        ), */
-
-      if (_showEvents &&
-          !eventsNotFound() &&
-          _events != null &&
-          _events!.isEmpty)
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(
-            vertical: 24.0,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return CustomScrollView(
+      controller: _controller,
+      slivers: [
+        /* SliverAppBar(
+          pinned: true,
+          floating: false,
+          backgroundColor: OVTheme.lightBackground,
+          title: Row(
             children: [
-              Icon(
-                Icons.wine_bar_outlined,
-                size: 48,
-                color: Colors.grey.withOpacity(0.5),
+              IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () => context.push('/leads'),
               ),
-              const SizedBox(height: 12),
-              FittedBox(
-                child: Text(
-                  AppLocalizations.of(context)!
-                      .noEventsFoundByLocation(_locationQuery),
-                  style: OVTheme.titlesBase.copyWith(
-                    fontSize: 20,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 8),
-              FittedBox(
-                child: Text(
-                  AppLocalizations.of(context)!
-                      .noEventsFoundByLocationSecondary,
-                  style: OVTheme.bodyBase.copyWith(
-                    color: OVTheme.muted,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 8),
-              FittedBox(
-                child: TextButton(
-                    onPressed: _resetSearch,
-                    style: TextButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(1),
-                      ),
-                      foregroundColor: OVTheme.primaryRed,
-                      backgroundColor: OVTheme.primaryRed,
-                    ),
-                    child: Text(AppLocalizations.of(context)!.discoverEvents,
-                        style: OVTheme.bodyBase.copyWith(
-                            color: Colors.white, fontWeight: FontWeight.w500))),
-              ),
-              const SizedBox(height: 48),
-              FittedBox(
-                child: Text(
-                  AppLocalizations.of(context)!.sendEventSuggestion,
-                  style: OVTheme.bodyBase,
-                  textAlign: TextAlign.center,
-                ),
-              ),
+              const AppLogo(),
             ],
           ),
+          actions: const [
+            AppLanguage(),
+          ],
+        ), */
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: LocationAutocomplete(
+              onClear: _resetSearch,
+              onSearch: (isSuggestion) {
+                _search(locationQuery);
+              },
+              onTextChanged: (t) => locationQuery = t,
+            ),
+          ),
         ),
-      if (_showEvents && _events != null)
-        ..._events!.map((event) => GestureDetector(
-              onTap: () => context.go('/event_detail', extra: event),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border:
-                        Border.all(color: OVTheme.semiTransparent, width: 0.8),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Text(
+              AppLocalizations.of(context)!.upcomingEvents,
+              style: OVTheme.bodyBase.copyWith(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              if (index == _events.length - 1) {
+                _loadMore();
+              }
+
+              final event = _events[index];
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                child: GestureDetector(
+                  onTap: () => context.go(
+                    '/event_detail',
+                    extra: event,
                   ),
                   child: buildEventCard(event),
                 ),
-              ),
-            )),
-      if (_showEvents && eventsNotFound())
-      Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(
-            vertical: 24.0,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(
-                Icons.wine_bar_outlined,
-                size: 48,
-                color: Colors.grey.withOpacity(0.5),
-              ),
-              const SizedBox(height: 12),
-              FittedBox(
-                child: Text(
-                  AppLocalizations.of(context)!
-                      .noEventsForNow,
-                  style: OVTheme.bodyBase.copyWith(
-                    color: OVTheme.muted,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              
-              const SizedBox(height: 48),
-              FittedBox(
-                child: Text(
-                  AppLocalizations.of(context)!.sendEventSuggestion,
-                  style: OVTheme.bodyBase,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
+              );
+            },
+            childCount: _events.length,
           ),
         ),
-    ];
+        SliverToBoxAdapter(
+          child: loading
+              ? Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Center(
+                      child: JumpingDots(
+                    color: OVTheme.muted,
+                    radius: 10,
+                    numberOfDots: 3,
+                  )),
+                )
+              : const SizedBox.shrink(),
+        ),
+      ],
+    );
   }
-
-  bool eventsNotFound() => (_events == null || _events!.isEmpty);
 
   Widget buildEventCard(EventModel event) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (event.image != null && event.image!.isNotEmpty)
+        /*   if (event.image != null && event.image!.isNotEmpty)
           Container(
             width: double.infinity,
             constraints: BoxConstraints(
@@ -278,7 +213,7 @@ class _EventsViewState extends State<EventsView> {
               fit: BoxFit.cover,
               width: double.infinity,
             ),
-          ),
+          ), */
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -373,12 +308,7 @@ class _EventsViewState extends State<EventsView> {
                       SizedBox(width: 4),
                       Flexible(
                         child: Text(
-                          event.location! +
-                              (event.municipality!.isNotEmpty
-                                  ? ' (${event.municipality})'
-                                  : event.district!.isNotEmpty
-                                      ? ' (${event.district})'
-                                      : ''),
+                          event.formattedLocation,
                           style: OVTheme.bodyBase.copyWith(
                             color: OVTheme.muted,
                           ),
@@ -451,100 +381,5 @@ class _EventsViewState extends State<EventsView> {
         ),
       ],
     );
-  }
-
-  List<Widget> searchPainelWidget(bool isWide) {
-    return [
-      Expanded(
-        flex: isWide ? 9 : 4,
-        child: LocationAutocomplete(
-          key: locationKey,
-          //   controller: locationController,
-          onClear: () {
-            _resetSearch();
-          },
-          onSearch: (bool isSearchingSuggestion) {
-            _isSearchingSuggestion = isSearchingSuggestion;
-            _submitSearch();
-          },
-          onTextChanged: (text) {
-            _locationQuery = text;
-            if (_locationQuery.isNotEmpty) {
-              setState(() {
-                _showEvents = false;
-              });
-            }
-          },
-          /*  onSelected: (result) {
-            print(result.label);
-            print(result.type);
-          }, */
-        ),
-      ),
-
-      /* FormBuilderDateRangePicker(
-              style: OVTheme.bodyBase,
-              name: 'quickSearchDateRange',
-              firstDate: DateTime(2020),
-              lastDate: DateTime(2030),
-              //   enableInteractiveSelection: false,
-              initialEntryMode: DatePickerEntryMode.calendarOnly,
-                
-              decoration: InputDecoration(
-                icon: Icon(Icons.calendar_today_outlined,
-                    color: OVTheme.muted),
-                border: OutlineInputBorder(
-                    borderSide:
-                        BorderSide(color: OVTheme.blackRetro, width: 1.2)),
-              ),
-            ), */
-    ];
-  }
-
-  void _resetSearch() {
-    setState(() {
-      _isSearching = false;
-      _showEvents = true;
-      locationKey.currentState?.clear();
-      locationKey.currentState?.resetSuggestions();
-      //_filteredEvents = _events;
-    });
-  }
-
-  Future<void> _submitSearch() async {
-    _showEvents = true;
-    if (_locationQuery.isEmpty) {
-      setState(() {
-        //_filteredEvents = _events;
-      });
-      return;
-    }
-
-    setState(() {
-      _isSearching = true;
-    });
-
-    /*  try { */
-    //await FunctionsService.searchEvents(_locationQuery);
-    /* if (ret.success) { */
-    //  Future.delayed(const Duration(seconds: 4), () async {
-    _events = await FirestoreService().searchEvents(_locationQuery);
-    if (_events!.isEmpty && !_isSearchingSuggestion) {
-      locationKey.currentState!.getSuggestions();
-      _isSearchingSuggestion = true;
-    }
-    //setState(() {});
-    if (mounted) setState(() => _isSearching = false);
-    //  });
-
-    /* } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('AppLocalizations.of(context)!.searchError'),
-          backgroundColor: OVTheme.primaryRed,
-        ));
-      } */
-    /*  } finally {
-      if (mounted) setState(() => _isSearching = false);
-    } */
   }
 }
