@@ -22,7 +22,7 @@ class _EventsViewState extends State<EventsView> {
   final GlobalKey<LocationAutocompleteState> locationKey =
       GlobalKey<LocationAutocompleteState>();
   final ScrollController _scrollController = ScrollController();
-  List<EventModel>? _events, _filteredEvents;
+  List<EventModel>? _events/* , _filteredEvents */;
   late final FirestoreService _firestoreService;
   late bool _isSearching;
   late bool _isSearchingSuggestion;
@@ -140,8 +140,8 @@ class _EventsViewState extends State<EventsView> {
 
       if (_showEvents &&
           !eventsNotFound() &&
-          _filteredEvents != null &&
-          _filteredEvents!.isEmpty)
+          _events != null &&
+          _events!.isEmpty)
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(
@@ -203,8 +203,8 @@ class _EventsViewState extends State<EventsView> {
             ],
           ),
         ),
-      if (_showEvents && _filteredEvents != null)
-        ..._filteredEvents!.map((event) => GestureDetector(
+      if (_showEvents && _events != null)
+        ..._events!.map((event) => GestureDetector(
               onTap: () => context.go('/event_detail', extra: event),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6),
@@ -507,7 +507,7 @@ class _EventsViewState extends State<EventsView> {
       _showEvents = true;
       locationKey.currentState?.clear();
       locationKey.currentState?.resetSuggestions();
-      _filteredEvents = _events;
+      //_filteredEvents = _events;
     });
   }
 
@@ -528,8 +528,8 @@ class _EventsViewState extends State<EventsView> {
     //await FunctionsService.searchEvents(_locationQuery);
     /* if (ret.success) { */
     //  Future.delayed(const Duration(seconds: 4), () async {
-    _filteredEvents = await FirestoreService().searchEvents(_locationQuery);
-    if (_filteredEvents!.isEmpty && !_isSearchingSuggestion) {
+    _events = await FirestoreService().searchEvents(_locationQuery);
+    if (_events!.isEmpty && !_isSearchingSuggestion) {
       locationKey.currentState!.getSuggestions();
       _isSearchingSuggestion = true;
     }
