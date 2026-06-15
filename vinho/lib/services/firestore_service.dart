@@ -21,6 +21,18 @@ class FirestoreService {
       .orderBy('date')
       .snapshots();
 
+  Future<QuerySnapshot<Object?>> getMoreEvents(
+      DocumentSnapshot? lastDoc) async {
+    Query query = events .orderBy('date').limit(10);
+
+    if (lastDoc != null) {
+      query = query.startAfterDocument(lastDoc);
+    }
+
+    final snapshot = await query.get();
+    return snapshot;
+  }
+
   Future<DocumentSnapshot?> getEvent(String id) async {
     try {
       return await events.doc(id).get();
